@@ -14,7 +14,7 @@ export function nodes_count(obj : object){
     return unique_nodes.size;
 }
 
-export function conta_archi(obj : object) {
+export function edges_count(obj : object) {
     let counter : number = 0;
     for(let key in obj){
         //console.log(obj[key]);
