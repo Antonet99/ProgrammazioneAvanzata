@@ -22,15 +22,15 @@ CREATE TABLE request (
     req_status TEXT,
     metadata JSONB,
     date_time DATE,
-    r_users INTEGER REFERENCES users(id_user),
-    r_graph INTEGER REFERENCES graph(id_graph)
+    req_users INTEGER REFERENCES users(id_user),
+    req_graph INTEGER REFERENCES graph(id_graph)
 );
 
 --NODI
 CREATE TABLE nodes (
     id_node SERIAL PRIMARY KEY,
     label TEXT,
-    r_graph INTEGER REFERENCES graph(id_graph)
+    ref_graph INTEGER REFERENCES graph(id_graph)
 );
 
 --ARCHI
