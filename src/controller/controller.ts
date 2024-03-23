@@ -1,4 +1,4 @@
-import { User, } from '../model/model';
+import { User, } from '../model/user';
 const GraphD = require("node-dijkstra");
 import { Request, Response } from 'express';
 import * as Utils from '../utils/utils'
@@ -12,36 +12,27 @@ export async function register(user: any, res: any) {
     });
 };
 
-
-
 export async function createGraph(req: Request, res: Response) { //teoricamente anche l'id dell'user deve essere passato
     
-    const grafo = new GraphD({
-        A: { B: 1 },
-        B: { A: 1, C: 2, D: 4 },
-    });
+    const graph = new GraphD(req.body);
 
-
-    const grafo2 = new GraphD(req.body);
-
-    console.log(grafo2);
-
+    // calcolo dimensione
     let nodes = Utils.nodes_count(req.body);
     let edges = Utils.edges_count(req.body);
 
+    // calcolo costi
+    let total_cost = (nodes * 0.1 + edges * 0.02);
 
     let resp = {
         "nodes" : nodes,
-        "edges" : edges
+        "edges" : edges,
+        "total_cost" : parseFloat(total_cost.toFixed(2))
     }
 
     res.json(resp);
     
     // validazione payload
 
-    // calcolo costi
-
-    // calcolo dimensione
 
     // inserimento in db tramite Graph model
 };

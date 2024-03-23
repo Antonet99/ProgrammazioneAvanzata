@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 import express from 'express';
-import { SequelizeDB } from './model/sequelize';
+import { SequelizeDB } from './singleton/sequelize';
 import router from './routes/router';
 
 const sequelize = SequelizeDB.getConnection();

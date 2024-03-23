@@ -1,13 +1,10 @@
 import express from 'express';
 import * as Controller from '../controller/controller';
+import * as Middleware from '../middleware/middleware';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.send('Hello World!');
-});
-
-router.post('/register', function(req: any, res: any) {
+router.post('/register', Middleware.AUTH, function(req: any, res: any) {
   Controller.register(req.body, res);
 });
 
@@ -15,7 +12,7 @@ router.post('/register', function(req: any, res: any) {
 
 // rotta per creazione grafo + validazione 
 
-router.post('/createGraph', function(req: any, res: any) {
+router.post('/createGraph', Middleware.VAL, function(req: any, res: any) {
   Controller.createGraph(req, res);
 });
 
