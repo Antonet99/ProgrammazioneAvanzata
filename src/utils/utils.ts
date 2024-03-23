@@ -16,3 +16,12 @@ export function conta_nodi(obj : object){
     //console.log(nodi_unici);
     return nodi_unici.size;
 }
+
+export function conta_archi(obj : object) {
+    let counter : number = 0;
+    for(let key in obj){
+        //console.log(obj[key]);
+        counter+=Object.keys( (obj as any)[key]).length;
+    }
+    return counter;
+}
