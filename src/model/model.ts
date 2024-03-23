@@ -11,16 +11,23 @@ export const User = sequelize.define('users', {
     },
     username: {
         type: DataTypes.TEXT,
-        unique: true
+        unique: true,
+        allowNull: false
     },
     email: {
         type: DataTypes.TEXT,
-        unique: true
+        unique: true,
+        allowNull: false
     },
     tokens : {
         type: DataTypes.REAL,
         defaultValue: 3
-    },
+    }
+  },
+  {
+    tableName: 'users',
+    timestamps: false,
+    freezeTableName: true
 });
 
 export const Graph = sequelize.define('graph', {
@@ -49,7 +56,13 @@ export const Graph = sequelize.define('graph', {
             key: 'id_user'
         }
     }
-});
+},
+  {
+    tableName: 'graph',
+    timestamps: false,
+    freezeTableName: true
+  }
+);
 
 export const Request = sequelize.define('request', {
     id_request: {
@@ -58,10 +71,12 @@ export const Request = sequelize.define('request', {
         primaryKey: true
     },
     req_status : {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        allowNull: false
     },
     metadata : {
-        type: DataTypes.JSONB
+        type: DataTypes.JSONB,
+        allowNull: false
     },
     date_time: {
         type: DataTypes.DATE,
@@ -81,7 +96,13 @@ export const Request = sequelize.define('request', {
             key: 'id_graph'
         }
     }
-});
+},
+  {
+    tableName: 'request',
+    timestamps: false,
+    freezeTableName: true
+  }
+);
 
 export const Nodes = sequelize.define('nodes', {
     id_node: {
@@ -90,7 +111,8 @@ export const Nodes = sequelize.define('nodes', {
         primaryKey: true
     },
     label : {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        allowNull: false
     },
     ref_graph: {
         type: DataTypes.INTEGER,
@@ -99,7 +121,12 @@ export const Nodes = sequelize.define('nodes', {
             key: 'id_graph'
         }
     }
-});
+},
+  {
+    tableName: 'nodes',
+    timestamps: false,
+    freezeTableName: true
+  });
 
 export const Edges = sequelize.define('edges', {
     previous_node: {
@@ -122,4 +149,9 @@ export const Edges = sequelize.define('edges', {
         type: DataTypes.REAL,
         allowNull: false
     }
-});
+},
+  {
+    tableName: 'edges',
+    timestamps: false,
+    freezeTableName: true
+  });

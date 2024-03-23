@@ -1,3 +1,6 @@
+CREATE DATABASE pa2;
+\c pa2
+
 --UTENTI
 CREATE TABLE users (
     id_user SERIAL PRIMARY KEY,
