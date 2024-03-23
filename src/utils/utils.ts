@@ -1,20 +1,17 @@
-
-
-
-export function conta_nodi(obj : object){
-    let nodi_unici = new Set<any>();
+export function nodes_count(obj : object){
+    let unique_nodes = new Set<any>();
     
     for(let key in obj){
-        nodi_unici.add(key);
+        unique_nodes.add(key);
         if (typeof (obj as any)[key] === 'object') {
             for (let ikey in (obj as any)[key]){
                 //console.log(ikey);
-                nodi_unici.add(ikey);
+                unique_nodes.add(ikey);
             }
         }
     }
-    //console.log(nodi_unici);
-    return nodi_unici.size;
+    //console.log(unique_nodes);
+    return unique_nodes.size;
 }
 
 export function conta_archi(obj : object) {

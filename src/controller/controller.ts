@@ -27,7 +27,6 @@ export async function createGraph(req: Request, res: Response) { //teoricamente 
     console.log(grafo2);
 
     let nodes = Utils.conta_nodi(req.body);
-    let edges = Utils.conta_archi(req.body);
 
     let resp = {
         "nodes" : nodes,
