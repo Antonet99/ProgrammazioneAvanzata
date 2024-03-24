@@ -1,13 +1,11 @@
-import * as middleAuth from "../middleware/middleAuth";
-import * as middleVal from "../middleware/middleVal";
+import * as authorization from "./authorization";
+import * as validation from "./validation";
 
 export const AUTH = [
-    middleAuth.checkAuthHeader,
-    middleAuth.checkPayloadHeader,
-    middleAuth.checkToken,
-    middleAuth.verifyAndAuthenticate,
+  authorization.checkAuthHeader,
+  authorization.checkPayloadHeader,
+  authorization.checkToken,
+  authorization.verifyAndAuthenticate,
 ];
 
-export const VAL = [
-    middleVal.checkPayloadHeader,
-];
+export const VAL = [validation.validateGraph];
