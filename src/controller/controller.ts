@@ -16,6 +16,47 @@ export async function register(user: any, res: any) {
     });
 }
 
+/*
+
+new Graph non funziona con json, ma funziona con un oggetto
+Quindi il payload passato tramite chiamata POST
+deve essere convertito in un oggetto con JSON.parse() prima di 
+essere passato a new Graph();
+
+INPUT:
+
+const Graph = require("node-dijkstra");
+
+payload = {
+  A: { B: 1 },
+  B: { A: 1, C: 2, D: 4, F: 7, ET: 32 },
+  C: { A: 1, D: 3 },
+};
+
+let json = JSON.stringify(payload);
+let obj = JSON.parse(json);
+
+const route = new Graph(obj);
+
+OUTPUT:
+
+tipo di payload: object
+tipo di json: string
+tipo di obj: object
+tipo di route: object
+
+output di route:
+
+Graph {
+  graph: Map(3) {
+    'A' => Map(1) { 'B' => 1 },
+    'B' => Map(5) { 'A' => 1, 'C' => 2, 'D' => 4, 'F' => 7, 'ET' => 32 },
+    'C' => Map(2) { 'A' => 1, 'D' => 3 }
+  }
+}
+
+*/
+
 export async function createGraph(req: Request, res: Response) {
   //teoricamente anche l'id dell'user deve essere passato
 
