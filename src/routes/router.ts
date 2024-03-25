@@ -21,4 +21,8 @@ router.post(
   }
 );
 
+router.get("/getGraph", function (req: any, res: any) {
+  Controller.getGraph(req, res);
+});
+
 export default router;

@@ -1,5 +1,5 @@
-import { User, getUser } from "../model/users";
-import { insertGraph } from "../model/graph";
+import { User, getUser, tokenUpdate } from "../model/users";
+import { Graph, insertGraph } from "../model/graph";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
 import sequelize from "sequelize";
@@ -17,8 +17,6 @@ export async function register(user: any, res: any) {
 }
 
 export async function createGraph(req: any, res: Response) {
-  //teoricamente anche l'id dell'user deve essere passato
-
   const graph = req.body;
   let user = await getUser(req.username);
 
@@ -26,7 +24,6 @@ export async function createGraph(req: any, res: Response) {
   const edges = Utils.edges_count(graph);
 
   const total_cost = nodes * 0.1 + edges * 0.02;
-  console.log(typeof total_cost);
 
   if (user.tokens > total_cost) {
     let obj = {
@@ -40,6 +37,7 @@ export async function createGraph(req: any, res: Response) {
 
     try {
       insertGraph(obj);
+      tokenUpdate(user.tokens - total_cost, user.username);
       res.status(200).send("Grafo creato con successo");
     } catch (error) {
       res.status(500).send("Errore nella creazione del grafo");
@@ -49,8 +47,11 @@ export async function createGraph(req: any, res: Response) {
   }
 }
 
-// Ottieni l'ID dell'utente dal token JWT
-// Recupera il saldo del token dell'utente dal database o da un servizio esterno
-// Confronta il saldo con il costo del grafo
-// Se il saldo è sufficiente, chiama next() per passare al middleware successivo
-// Altrimenti, restituisci un errore di saldo insufficiente
+export async function getGraph(req: any, res: any) {
+  let result: any;
+  result = await Graph.findAll({
+    include: [{ model: User, attributes: ["username"], required: true }],
+  }).catch((error) => {
+    res.status(500).send("Errore nella funzione getGraph");
+  });
+}
