@@ -48,10 +48,14 @@ export async function createGraph(req: any, res: Response) {
 }
 
 export async function getGraph(req: any, res: any) {
-  let result: any;
-  result = await Graph.findAll({
-    include: [{ model: User, attributes: ["username"], required: true }],
+  //let result: any;
+  let result : any = await Graph.findAll({
+    raw : true,
+    attributes : ["id_graph", "nodes", "edges", "costo", "id_creator"]
+    //include: [{ model: User, attributes: ["username"], required: true }],
   }).catch((error) => {
     res.status(500).send("Errore nella funzione getGraph");
   });
+
+  res.status(200).send(result);
 }
