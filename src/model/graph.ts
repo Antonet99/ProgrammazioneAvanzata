@@ -1,6 +1,6 @@
 import { SequelizeDB } from "../singleton/sequelize";
 import { Sequelize, DataTypes } from "sequelize";
-import { User } from "./user";
+import { User } from "./users";
 
 const sequelize = SequelizeDB.getConnection();
 
@@ -23,11 +23,11 @@ export const Graph = sequelize.define(
       type: DataTypes.INTEGER,
     },
     costo: {
-      type: DataTypes.DOUBLE,
+      type: DataTypes.INTEGER,
     },
     date_time: {
       type: DataTypes.DATE,
-      //defaultValue: Sequelize.literal("NOW"),
+      defaultValue: Sequelize.literal("NOW"),
     },
     id_creator: {
       type: DataTypes.INTEGER,
@@ -43,3 +43,14 @@ export const Graph = sequelize.define(
     freezeTableName: true,
   }
 );
+
+export async function insertGraph(object: any, cost: number) {
+  const graph = await Graph.create({
+    graph: object,
+    nodes: object.nodes,
+    edges: object.edges,
+    costo: cost,
+    id_creator: object.id_user,
+  });
+  return graph;
+}

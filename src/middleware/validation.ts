@@ -18,19 +18,36 @@ if User.token >= costo, validate richiesta
 // Salva le informazioni del grafo e il costo nell'oggetto req per utilizzarli successivamente
 // Chiama next() per passare al middleware successivo
 
-export function validateGraph(req: Request, res: Response, next: NextFunction) {
-  const graph = req.body; //da cambiare
+export function validateGraph(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  const graph = req.body;
   if (!graph) {
-    return res.status(400).json({ error: "Grafo mancante nella richiesta" });
+    res.status(400).json({ error: "Grafo mancante nella richiesta" });
+    return;
   }
 
   // Validazione della struttura del grafo
   if (
-    !graph || //graph non null o undefined
     typeof graph !== "object" || // verifica che graph sia un oggetto
     Object.values(graph).some((node) => typeof node !== "object") // verifica che ogni valore in graph sia un oggetto
   ) {
-    return res.status(400).json({ error: "Struttura del grafo non valida" });
+    res.status(400).json({ error: "Struttura del grafo non valida" });
+    return;
+  }
+
+  // Verifica che tutti i pesi degli archi siano numeri non negativi
+  for (const node in graph) {
+    for (const edge in graph[node]) {
+      if (typeof graph[node][edge] !== "number" || graph[node][edge] < 0) {
+        res
+          .status(400)
+          .json({ error: `Peso dell'arco ${graph[node][edge]} non valido` });
+        return;
+      }
+    }
   }
 
   next();
