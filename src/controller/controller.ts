@@ -20,27 +20,27 @@ export async function createGraph(req: any, res: Response) {
   //teoricamente anche l'id dell'user deve essere passato
 
   const graph = req.body;
-  //console.log(req.username);
+  let user = await getUser(req.username);
 
   const nodes = Utils.nodes_count(graph);
   const edges = Utils.edges_count(graph);
 
   const total_cost = nodes * 0.1 + edges * 0.02;
-
-  let user: any;
-  user = await getUser(req.username);
+  console.log(typeof total_cost);
 
   if (user.tokens > total_cost) {
     let obj = {
       graph: JSON.stringify(graph),
       nodes: nodes,
       edges: edges,
-      cost: total_cost,
-      id_user: user.id_user,
+      costo: parseFloat(total_cost.toFixed(2)),
+      date_time: sequelize.literal("CURRENT_TIMESTAMP"),
+      id_user: parseInt(user.get("id_user")),
     };
 
     try {
       insertGraph(obj);
+      res.status(200).send("Grafo creato con successo");
     } catch (error) {
       res.status(500).send("Errore nella creazione del grafo");
     }
