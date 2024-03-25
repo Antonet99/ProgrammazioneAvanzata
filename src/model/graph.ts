@@ -23,11 +23,11 @@ export const Graph = sequelize.define(
       type: DataTypes.INTEGER,
     },
     costo: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DOUBLE,
     },
     date_time: {
       type: DataTypes.DATE,
-      defaultValue: Sequelize.literal("NOW"),
+      //defaultValue: Sequelize.literal("NOW"),
     },
     id_creator: {
       type: DataTypes.INTEGER,

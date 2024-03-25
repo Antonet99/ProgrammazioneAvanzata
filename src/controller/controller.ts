@@ -3,6 +3,8 @@ import { Graph } from "../model/graph";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
 import { json } from "sequelize";
+import { JSONB } from "sequelize";
+import sequelize from "sequelize";
 
 const GraphD = require("node-dijkstra");
 
@@ -62,8 +64,8 @@ export async function createGraph(req: Request, res: Response) {
 
   let graph = req.body;
 
-  let nodes = Utils.nodes_count(req.body);
-  let edges = Utils.edges_count(req.body);
+  let nodes = Utils.nodes_count(graph);
+  let edges = Utils.edges_count(graph);
 
   let total_cost = nodes * 0.1 + edges * 0.02;
 
@@ -73,22 +75,30 @@ export async function createGraph(req: Request, res: Response) {
     total_cost: parseFloat(total_cost.toFixed(2)),
   };
 
-  graph = new GraphD(req.body);
+  let graph_l = new GraphD(graph);
 
+  //console.log(graph_l);
   /*   if (await checkBalance(req.body.id_user, total_cost, res)) {
     res.json(resp);
   } */
 
-  Graph.create({
-    graph: json(graph),
+  //let date = new Date().toLocaleDateString();
+  //let date = sequelize.literal("CURRENT_TIMESTAMP");
+  let date = new Date().
+
+  const new_G = await Graph.create({
+    graph: JSON.stringify(graph),
     nodes: nodes,
     edges: edges,
     cost: total_cost,
+    data_time : ,
+    id_creator : 1
   })
     .then(() => {
       res.json(graph);
     })
     .catch((error) => {
+      //console.log(error);
       res.status(500).send("Errore nella funzione createGraph");
     });
 }
