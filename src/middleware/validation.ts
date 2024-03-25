@@ -49,16 +49,5 @@ export function validateGraph(
       }
     }
   }
-
   next();
-}
-
-// 2.2 Verifica del saldo del token dell'utente
-export function checkUserBalance(req: any, res: any, next: any): void {
-  Controller.checkBalance(req.body.id_user, req.body.cost, res).then(
-    (check) => {
-      if (check) next();
-      else next();
-    }
-  );
 }

@@ -12,7 +12,7 @@ router.post("/register", Middleware.AUTH, function (req: any, res: any) {
 
 // rotta per creazione grafo + validazione
 
-router.post("/createGraph", function (req: any, res: any) {
+router.post("/createGraph", Middleware.AUTH, function (req: any, res: any) {
   Controller.createGraph(req, res);
 });
 

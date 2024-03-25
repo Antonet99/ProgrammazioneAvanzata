@@ -33,12 +33,28 @@ export const User = sequelize.define(
   }
 );
 
-export async function getToken(username: string) {
+/* export async function getToken(username: string) {
   const tokens = await User.findOne({
     attributes: ["tokens"],
     where: { username: `${username}` },
   });
   return tokens;
+}
+
+export async function getUserId(username: string) {
+  const id_user = await User.findOne({
+    attributes: ["id_user"],
+    where: { username: `${username}` },
+  });
+  return id_user;
+} */
+
+export async function getUser(username: string) {
+  let user: any;
+  user = await User.findOne({
+    where: { username: username },
+  });
+  return user;
 }
 
 export async function checkExistingUser(username: string) {

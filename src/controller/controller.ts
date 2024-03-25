@@ -1,5 +1,5 @@
-import { User } from "../model/users";
-import { Graph } from "../model/graph";
+import { User, getUser } from "../model/users";
+import { insertGraph } from "../model/graph";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
 import sequelize from "sequelize";
@@ -16,35 +16,37 @@ export async function register(user: any, res: any) {
     });
 }
 
-export async function createGraph(req: Request, res: Response) {
+export async function createGraph(req: any, res: Response) {
   //teoricamente anche l'id dell'user deve essere passato
 
-  let graph = req.body;
+  const graph = req.body;
+  //console.log(req.username);
 
-  let nodes = Utils.nodes_count(graph);
-  let edges = Utils.edges_count(graph);
+  const nodes = Utils.nodes_count(graph);
+  const edges = Utils.edges_count(graph);
 
-  let total_cost = nodes * 0.1 + edges * 0.02;
+  const total_cost = nodes * 0.1 + edges * 0.02;
 
-  //console.log(graph_l);
-  /*   if (await checkBalance(req.body.id_user, total_cost, res)) {
-    res.json(resp);
-  } */
+  let user: any;
+  user = await getUser(req.username);
 
-  const new_G = await Graph.create({
-    graph: JSON.stringify(graph),
-    nodes: nodes,
-    edges: edges,
-    costo: parseFloat(total_cost.toFixed(2)),
-    date_time: sequelize.literal("CURRENT_TIMESTAMP"),
-    id_creator: 1,
-  })
-    .then(() => {
-      res.json(graph);
-    })
-    .catch((error) => {
-      res.status(500).send("Errore nella funzione createGraph");
-    });
+  if (user.tokens > total_cost) {
+    let obj = {
+      graph: JSON.stringify(graph),
+      nodes: nodes,
+      edges: edges,
+      cost: total_cost,
+      id_user: user.id_user,
+    };
+
+    try {
+      insertGraph(obj);
+    } catch (error) {
+      res.status(500).send("Errore nella creazione del grafo");
+    }
+  } else {
+    res.status(500).send("Token insufficienti");
+  }
 }
 
 // Ottieni l'ID dell'utente dal token JWT
@@ -52,34 +54,3 @@ export async function createGraph(req: Request, res: Response) {
 // Confronta il saldo con il costo del grafo
 // Se il saldo è sufficiente, chiama next() per passare al middleware successivo
 // Altrimenti, restituisci un errore di saldo insufficiente
-
-export async function checkBalance(
-  id_user: string,
-  cost: number,
-  res: any
-): Promise<boolean> {
-  let result: any;
-  try {
-    result = await User.findByPk(id_user, { raw: true });
-  } catch (error) {
-    res.status(500).json({ error: "Utente non trovato." });
-  }
-  if (result.token >= cost) return true;
-  else return false;
-}
-
-/*
-let str : string = 
-`{
-        'A': {
-          'B': 1
-        },
-        'B': {
-          'A': 1,
-          'C': 2,
-          'D': 4
-        }
-      }`;
-
-    let j = JSON.parse(str.replace(/'/g, '"'));
-*/

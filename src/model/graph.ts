@@ -43,13 +43,8 @@ export const Graph = sequelize.define(
   }
 );
 
-export async function insertGraph(object: any, cost: number) {
-  const graph = await Graph.create({
-    graph: object,
-    nodes: object.nodes,
-    edges: object.edges,
-    costo: cost,
-    id_creator: object.id_user,
+export async function insertGraph(graph: any) {
+  await Graph.create(graph).catch((error) => {
+    error;
   });
-  return graph;
 }
