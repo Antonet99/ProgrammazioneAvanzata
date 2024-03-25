@@ -35,7 +35,7 @@ export async function createGraph(req: any, res: Response) {
       edges: edges,
       costo: parseFloat(total_cost.toFixed(2)),
       date_time: sequelize.literal("CURRENT_TIMESTAMP"),
-      id_user: parseInt(user.get("id_user")),
+      id_creator: parseInt(user.get("id_user")),
     };
 
     try {

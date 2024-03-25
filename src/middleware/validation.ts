@@ -24,7 +24,7 @@ export function validateGraph(
   next: NextFunction
 ): void {
   const graph = req.body;
-  if (!graph) {
+  if (Object.keys(graph).length == 0) {
     res.status(400).json({ error: "Grafo mancante nella richiesta" });
     return;
   }
