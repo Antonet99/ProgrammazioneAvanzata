@@ -1,9 +1,7 @@
-import { User } from "../model/user";
+import { User } from "../model/users";
 import { Graph } from "../model/graph";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
-import { json } from "sequelize";
-import { JSONB } from "sequelize";
 import sequelize from "sequelize";
 
 const GraphD = require("node-dijkstra");
@@ -18,47 +16,6 @@ export async function register(user: any, res: any) {
     });
 }
 
-/*
-
-new Graph non funziona con json, ma funziona con un oggetto
-Quindi il payload passato tramite chiamata POST
-deve essere convertito in un oggetto con JSON.parse() prima di 
-essere passato a new Graph();
-
-INPUT:
-
-const Graph = require("node-dijkstra");
-
-payload = {
-  A: { B: 1 },
-  B: { A: 1, C: 2, D: 4, F: 7, ET: 32 },
-  C: { A: 1, D: 3 },
-};
-
-let json = JSON.stringify(payload);
-let obj = JSON.parse(json);
-
-const route = new Graph(obj);
-
-OUTPUT:
-
-tipo di payload: object
-tipo di json: string
-tipo di obj: object
-tipo di route: object
-
-output di route:
-
-Graph {
-  graph: Map(3) {
-    'A' => Map(1) { 'B' => 1 },
-    'B' => Map(5) { 'A' => 1, 'C' => 2, 'D' => 4, 'F' => 7, 'ET' => 32 },
-    'C' => Map(2) { 'A' => 1, 'D' => 3 }
-  }
-}
-
-*/
-
 export async function createGraph(req: Request, res: Response) {
   //teoricamente anche l'id dell'user deve essere passato
 
@@ -69,36 +26,23 @@ export async function createGraph(req: Request, res: Response) {
 
   let total_cost = nodes * 0.1 + edges * 0.02;
 
-  let resp = {
-    nodes: nodes,
-    edges: edges,
-    total_cost: parseFloat(total_cost.toFixed(2)),
-  };
-
-  let graph_l = new GraphD(graph);
-
   //console.log(graph_l);
   /*   if (await checkBalance(req.body.id_user, total_cost, res)) {
     res.json(resp);
   } */
 
-  //let date = new Date().toLocaleDateString();
-  //let date = sequelize.literal("CURRENT_TIMESTAMP");
-  let date = new Date().
-
   const new_G = await Graph.create({
     graph: JSON.stringify(graph),
     nodes: nodes,
     edges: edges,
-    cost: total_cost,
-    data_time : ,
-    id_creator : 1
+    costo: parseFloat(total_cost.toFixed(2)),
+    date_time: sequelize.literal("CURRENT_TIMESTAMP"),
+    id_creator: 1,
   })
     .then(() => {
       res.json(graph);
     })
     .catch((error) => {
-      //console.log(error);
       res.status(500).send("Errore nella funzione createGraph");
     });
 }
