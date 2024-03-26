@@ -23,7 +23,6 @@ export const Request = sequelize.define(
     },
     date_time: {
       type: DataTypes.DATE,
-      defaultValue: Sequelize.literal("NOW"),
     },
     req_user: {
       type: DataTypes.INTEGER,

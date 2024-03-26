@@ -1,8 +1,10 @@
-require('dotenv').config();
+require("dotenv").config();
 
-import express from 'express';
-import { SequelizeDB } from './singleton/sequelize';
-import router from './routes/router';
+import express from "express";
+import { SequelizeDB } from "./singleton/sequelize";
+import { checkAlpha, alpha } from "./utils/utils";
+
+import router from "./routes/router";
 
 const sequelize = SequelizeDB.getConnection();
 
@@ -15,13 +17,19 @@ app.use(router);
 app.listen(port, () => {
   console.log(`App in ascolto sulla porta ${port}...`);
   try {
-      sequelize.authenticate();
-      console.log('Connesso al database.');
-      sequelize.sync()
-      .then(() => console.log('Tabella del modello creata con successo.'))
-      .catch(error => console.log('Si è verificato un errore durante la creazione della tabella del modello:', error));
-      
+    sequelize.authenticate();
+    console.log("Connesso al database.");
+    checkAlpha();
+    sequelize
+      .sync()
+      .then(() => console.log("Tabella del modello creata con successo."))
+      .catch((error) =>
+        console.log(
+          "Si è verificato un errore durante la creazione della tabella del modello:",
+          error
+        )
+      );
   } catch (error) {
-      console.error('Errore nella connessione al database:', error);
+    console.error("Errore nella connessione al database:", error);
   }
 });
