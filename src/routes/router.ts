@@ -21,8 +21,13 @@ router.post(
   }
 );
 
-router.get("/getGraph", function (req: any, res: any) {
+router.get("/getGraph", async function (req: any, res: any) {
   Controller.getGraph(req, res);
 });
+
+
+router.post("/updateEdge",Middleware.AUTH, async function (req : any, res : any) {
+  await Controller.updateWeight(req,res);
+})
 
 export default router;

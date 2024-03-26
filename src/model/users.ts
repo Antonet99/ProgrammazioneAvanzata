@@ -52,6 +52,7 @@ export async function getUserId(username: string) {
 export async function getUser(username: string) {
   let user: any;
   user = await User.findOne({
+    raw : true,
     where: { username: username },
   });
   return user;

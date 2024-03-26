@@ -20,7 +20,7 @@ app.listen(port, () => {
       sequelize.sync()
       .then(() => console.log('Tabella del modello creata con successo.'))
       .catch(error => console.log('Si è verificato un errore durante la creazione della tabella del modello:', error));
-
+      
   } catch (error) {
       console.error('Errore nella connessione al database:', error);
   }
