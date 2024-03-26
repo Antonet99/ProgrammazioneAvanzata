@@ -51,3 +51,39 @@ export function validateGraph(
   }
   next();
 }
+
+export async function validateUpdateRequest(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const requests = req.body;
+
+  if (Object.keys(requests).length == 0) {
+    res.status(400).json({ error: "Richiesta mancante nel body" });
+    return;
+  }
+
+  // Validazione della struttura della richiesta
+  if (
+    typeof requests !== "object" // verifica che requests sia un oggetto
+  ) {
+    res.status(400).json({ error: "Struttura della richiesta non valida" });
+    return;
+  }
+
+  if (
+    Object.values(requests).some(
+      (request) =>
+        typeof requests.start !== "string" &&
+        typeof requests.end !== "string" &&
+        typeof requests.weight !== "number" &&
+        requests.weight < 0
+    )
+  ) {
+    res.status(400).json({ error: "Struttura della richiesta non valida" });
+    return;
+  }
+
+  next();
+}

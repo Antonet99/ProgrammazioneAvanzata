@@ -2,7 +2,7 @@ require("dotenv").config();
 
 import express from "express";
 import { SequelizeDB } from "./singleton/sequelize";
-import { checkAlpha, alpha } from "./utils/utils";
+import { checkAlpha } from "./utils/utils";
 
 import router from "./routes/router";
 

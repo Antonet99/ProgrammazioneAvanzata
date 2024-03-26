@@ -8,4 +8,6 @@ export const AUTH = [
   authorization.verifyAndAuthenticate,
 ];
 
-export const VAL = [validation.validateGraph];
+export const GRAPH = [validation.validateGraph];
+
+export const UPDATE = [validation.validateUpdateRequest];

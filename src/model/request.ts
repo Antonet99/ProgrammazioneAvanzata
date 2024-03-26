@@ -21,10 +21,14 @@ export const Request = sequelize.define(
       type: DataTypes.JSONB,
       allowNull: false,
     },
+    costo: {
+      type: DataTypes.REAL,
+      allowNull: false,
+    },
     date_time: {
       type: DataTypes.DATE,
     },
-    req_user: {
+    req_users: {
       type: DataTypes.INTEGER,
       references: {
         model: User,
@@ -45,3 +49,17 @@ export const Request = sequelize.define(
     freezeTableName: true,
   }
 );
+
+//get request
+
+export async function getRequests(id_graph: number) {
+  let result: any;
+  result = await Request.findAll({
+    raw: true,
+    where: { req_graph: id_graph, req_status: "pending" },
+    attributes: {
+      exclude: ["req_graph"],
+    },
+  });
+  return result;
+}
