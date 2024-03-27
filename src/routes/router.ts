@@ -34,8 +34,12 @@ router.post("/getPendingRequests", async function (req: any, res: any) {
   Controller.getPendingRequests(req, res);
 });
 
-router.post("/executeModel", async function (req: any, res: any) {
-  Controller.executeModel(req, res);
-});
+router.post(
+  "/executeModel",
+  Middleware.AUTH,
+  async function (req: any, res: any) {
+    Controller.executeModel(req, res);
+  }
+);
 
 export default router;

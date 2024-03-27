@@ -198,6 +198,8 @@ export async function executeModel(req: any, res: any) {
   let start = req.body.start;
   let goal = req.body.goal;
 
+  let user = await getUser(req.username);
+
   let graph_obj = await getGraphById(id_graph);
   let graph = JSON.parse(graph_obj.graph);
 
@@ -216,10 +218,12 @@ export async function executeModel(req: any, res: any) {
     let result = {
       Percorso: path,
       Costo: cost,
-      "Tempo di esecuzione": executionTime,
+      "Tempo di esecuzione": parseFloat(executionTime.toFixed(3)),
     };
 
     res.status(200).send(result);
+
+    tokenUpdate(user.tokens - graph_obj.costo, user.username);
   } catch (error: any) {
     res
       .status(500)
