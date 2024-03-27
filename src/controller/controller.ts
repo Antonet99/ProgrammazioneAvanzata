@@ -1,5 +1,5 @@
 import { User, getUser, tokenUpdate } from "../model/users";
-import { Graph, insertGraph } from "../model/graph";
+import { Graph, insertGraph, getGraphById } from "../model/graph";
 import * as UpdateRequest from "../model/request";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
@@ -88,14 +88,18 @@ export async function updateWeight(req: any, res: Response) {
     return;
   }
 
-  const graph_obj: any = await Graph.findOne({
+  const graph_obj: any = await getGraphById(graph_id).catch((error) => {
+    res.status(500).send("Errore nella funzione update");
+  });
+
+  /*   const graph_obj: any = await Graph.findOne({
     raw: true,
     where: {
       id_graph: graph_id,
     },
   }).catch((error) => {
     res.status(500).send("Errore nella funzione update");
-  });
+  }); */
 
   //quando le valido calcolo il nuovo peso
   /*for(let i in requests){ 
@@ -187,4 +191,38 @@ export async function getPendingRequests(req: any, res: any) {
   let result = await UpdateRequest.getRequests(id_graph);
 
   res.status(200).send(result);
+}
+
+export async function executeModel(req: any, res: any) {
+  let id_graph = req.body.id_graph;
+  let start = req.body.start;
+  let goal = req.body.goal;
+
+  let graph_obj = await getGraphById(id_graph);
+  let graph = JSON.parse(graph_obj.graph);
+
+  const route = new GraphD(graph);
+
+  try {
+    const startTime = performance.now();
+    let execute = route.path(start, goal, { cost: true });
+    const endTime = performance.now();
+
+    let path = execute.path;
+    let cost = execute.cost;
+
+    const executionTime = endTime - startTime;
+
+    let result = {
+      Percorso: path,
+      Costo: cost,
+      "Tempo di esecuzione": executionTime,
+    };
+
+    res.status(200).send(result);
+  } catch (error: any) {
+    res
+      .status(500)
+      .send("Errore nell'esecuzione del modello: " + error.message);
+  }
 }

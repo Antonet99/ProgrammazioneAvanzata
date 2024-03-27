@@ -13,7 +13,7 @@ export const Graph = sequelize.define(
       primaryKey: true,
     },
     graph: {
-      type: DataTypes.JSON,
+      type: DataTypes.JSONB,
       allowNull: false,
     },
     nodes: {
@@ -47,4 +47,13 @@ export async function insertGraph(graph: any) {
   await Graph.create(graph).catch((error) => {
     error;
   });
+}
+
+export async function getGraphById(id_graph: number) {
+  let result: any;
+  result = await Graph.findOne({
+    raw: true,
+    where: { id_graph: id_graph },
+  });
+  return result;
 }

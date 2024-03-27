@@ -25,6 +25,7 @@ CREATE TABLE request (
     id_request SERIAL PRIMARY KEY,
     req_status TEXT,
     metadata JSONB,
+    costo REAL,
     date_time DATE,
     req_users INTEGER REFERENCES users(id_user),
     req_graph INTEGER REFERENCES graph(id_graph)

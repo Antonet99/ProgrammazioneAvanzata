@@ -16,20 +16,13 @@ app.use(router);
 
 app.listen(port, () => {
   console.log(`App in ascolto sulla porta ${port}...`);
-  try {
-    sequelize.authenticate();
-    console.log("Connesso al database.");
-    checkAlpha();
-    sequelize
-      .sync()
-      .then(() => console.log("Tabella del modello creata con successo."))
-      .catch((error) =>
-        console.log(
-          "Si è verificato un errore durante la creazione della tabella del modello:",
-          error
-        )
-      );
-  } catch (error) {
-    console.error("Errore nella connessione al database:", error);
-  }
+  //checkAlpha();
+  sequelize
+    .sync()
+    .then(() => {
+      console.log("Tabelle sincronizzate.");
+    })
+    .catch((err) => {
+      console.log("Errore nella sincronizzazione delle tabelle: ", err);
+    });
 });

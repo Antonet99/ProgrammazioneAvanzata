@@ -8,10 +8,6 @@ router.post("/register", function (req: any, res: any) {
   Controller.register(req.body, res);
 });
 
-//TO DO
-
-// rotta per creazione grafo + validazione
-
 router.post(
   "/createGraph",
   Middleware.AUTH,
@@ -36,6 +32,10 @@ router.post(
 
 router.post("/getPendingRequests", async function (req: any, res: any) {
   Controller.getPendingRequests(req, res);
+});
+
+router.post("/executeModel", async function (req: any, res: any) {
+  Controller.executeModel(req, res);
 });
 
 export default router;
