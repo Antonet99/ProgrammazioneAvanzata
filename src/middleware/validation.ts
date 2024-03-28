@@ -40,8 +40,8 @@ export function validateGraph(
 
   // Verifica che tutti i pesi degli archi siano numeri non negativi
   for (const node in graph) {
-    for (const edge in graph[node]) {
-      if (typeof graph[node][edge] !== "number" || graph[node][edge] < 0) {
+    for (const edge in graph[node]) { //node == edge per verificare autocicli (A : {A : 1})
+      if (typeof graph[node][edge] !== "number" || graph[node][edge] < 0 || node == edge) {
         res
           .status(400)
           .json({ error: `Peso dell'arco ${graph[node][edge]} non valido` });
@@ -49,6 +49,8 @@ export function validateGraph(
       }
     }
   }
+
+
   next();
 }
 
