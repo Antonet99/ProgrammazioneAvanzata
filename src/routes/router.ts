@@ -42,4 +42,8 @@ router.post(
   }
 );
 
+router.post("/acceptRequest", Middleware.AUTH, function (req: any, res: any) {
+  Controller.acceptRequest(req, res);
+});
+
 export default router;

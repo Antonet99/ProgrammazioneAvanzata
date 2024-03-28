@@ -1,3 +1,4 @@
+import { raw } from "express";
 import { SequelizeDB } from "../singleton/sequelize";
 import { Sequelize, DataTypes } from "sequelize";
 
@@ -52,8 +53,16 @@ export async function getUserId(username: string) {
 export async function getUser(username: string) {
   let user: any;
   user = await User.findOne({
-    raw : true,
+    raw: true,
     where: { username: username },
+  });
+  return user;
+}
+
+export async function getUserById(id_user: number) {
+  let user: any;
+  user = await User.findByPk(id_user, {
+    raw: true,
   });
   return user;
 }
