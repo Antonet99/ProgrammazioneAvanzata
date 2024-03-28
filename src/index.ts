@@ -16,7 +16,7 @@ app.use(router);
 
 app.listen(port, () => {
   console.log(`App in ascolto sulla porta ${port}...`);
-  //checkAlpha();
+  checkAlpha();
   sequelize
     .sync()
     .then(() => {

@@ -150,7 +150,8 @@ export async function updateWeight(req: any, res: Response) {
       let start: string = data[i]["start"];
       let end: string = data[i]["end"];
       let new_weight = data[i]["weight"];
-      let old_weight = graph[start][end] as number; // qui try catch in caso non esiste l'arco sul grafo
+      console.log(new_weight);
+      let old_weight = graph[start][end]; // qui try catch in caso non esiste l'arco sul grafo
 
       //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
       data[i]["weight"] = Utils.exp_avg(old_weight, new_weight);
@@ -259,7 +260,6 @@ export async function acceptRequest(req: any, res: any) {
 
   for (let i in graph_req) {
     let id_creator = graph_req[i].id_creator;
-    console.log(typeof id_creator, typeof id_user);
     if (id_user != id_creator) {
       res.status(500).send("Non sei il creatore del grafo");
       return;
