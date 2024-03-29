@@ -1,21 +1,11 @@
-import { User, getUser, getUserById, tokenUpdate } from "../model/users";
+import { getUser, getUserById, tokenUpdate } from "../model/users";
 import { Graph, insertGraph, getGraphById } from "../model/graph";
 import * as UpdateRequest from "../model/request";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
-import sequelize, { where } from "sequelize";
+import sequelize from "sequelize";
 
 const GraphD = require("node-dijkstra");
-
-export async function register(user: any, res: any) {
-  User.create(user)
-    .then((user) => {
-      res.json(user);
-    })
-    .catch((error) => {
-      res.status(500).send("Errore nella funzione register");
-    });
-}
 
 export async function createGraph(req: any, res: Response) {
   const graph = req.body;
@@ -26,6 +16,7 @@ export async function createGraph(req: any, res: Response) {
 
   const total_cost = nodes * 0.1 + edges * 0.02;
 
+  //si può utilizzare builder per creare il grafo
   if (user.tokens > total_cost) {
     let obj = {
       graph: JSON.stringify(graph),
@@ -150,8 +141,7 @@ export async function updateWeight(req: any, res: Response) {
       let start: string = data[i]["start"];
       let end: string = data[i]["end"];
       let new_weight = data[i]["weight"];
-      console.log(new_weight);
-      let old_weight = graph[start][end]; // qui try catch in caso non esiste l'arco sul grafo
+      let old_weight = graph[start][end] as number; // qui try catch in caso non esiste l'arco sul grafo
 
       //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
       data[i]["weight"] = Utils.exp_avg(old_weight, new_weight);
@@ -260,6 +250,7 @@ export async function acceptRequest(req: any, res: any) {
 
   for (let i in graph_req) {
     let id_creator = graph_req[i].id_creator;
+    console.log(typeof id_creator, typeof id_user);
     if (id_user != id_creator) {
       res.status(500).send("Non sei il creatore del grafo");
       return;
@@ -334,4 +325,25 @@ export async function acceptRequest(req: any, res: any) {
     }
   }
   res.status(200).send("Richieste accettate/rifiutate");
+}
+
+export async function rechargeTokens(req: any, res: any) {
+  let admin = await getUser(req.username); //user admin che ricarica
+  let user = await getUser(req.body.username); //user a cui ricaricare
+  let amount = req.body.amount;
+
+  if (!admin || admin.role != "admin") {
+    res.status(500).send("Utente admin non trovato");
+    return;
+  } else if (!user) {
+    res.status(500).send("Utente non trovato");
+    return;
+  }
+
+  try {
+    await tokenUpdate(user.tokens + amount, user.username);
+    res.status(200).send("Ricarica dei token effettuata");
+  } catch (error) {
+    res.status(500).send("Errore nella ricarica dei token");
+  }
 }

@@ -1,6 +1,6 @@
 import { raw } from "express";
 import { SequelizeDB } from "../singleton/sequelize";
-import { Sequelize, DataTypes } from "sequelize";
+import { Sequelize, DataTypes, where } from "sequelize";
 
 const sequelize = SequelizeDB.getConnection();
 
@@ -22,6 +22,12 @@ export const User = sequelize.define(
       unique: true,
       allowNull: false,
     },
+    role: {
+      type: DataTypes.ENUM,
+      values: ["admin", "user"],
+      defaultValue: "user",
+      allowNull: false,
+    },
     tokens: {
       type: DataTypes.REAL,
       defaultValue: 3,
@@ -33,22 +39,6 @@ export const User = sequelize.define(
     freezeTableName: true,
   }
 );
-
-/* export async function getToken(username: string) {
-  const tokens = await User.findOne({
-    attributes: ["tokens"],
-    where: { username: `${username}` },
-  });
-  return tokens;
-}
-
-export async function getUserId(username: string) {
-  const id_user = await User.findOne({
-    attributes: ["id_user"],
-    where: { username: `${username}` },
-  });
-  return id_user;
-} */
 
 export async function getUser(username: string) {
   let user: any;

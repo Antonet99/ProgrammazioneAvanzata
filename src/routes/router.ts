@@ -4,10 +4,6 @@ import * as Middleware from "../middleware/middleware";
 
 const router = express.Router();
 
-router.post("/register", function (req: any, res: any) {
-  Controller.register(req.body, res);
-});
-
 router.post(
   "/createGraph",
   Middleware.AUTH,
@@ -44,6 +40,10 @@ router.post(
 
 router.post("/acceptRequest", Middleware.AUTH, function (req: any, res: any) {
   Controller.acceptRequest(req, res);
+});
+
+router.post("/recharge", Middleware.AUTH, function (req: any, res: any) {
+  Controller.rechargeTokens(req, res);
 });
 
 export default router;

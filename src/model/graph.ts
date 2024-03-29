@@ -57,3 +57,11 @@ export async function getGraphById(id_graph: number) {
   });
   return result;
 }
+
+export async function getGraph() {
+  let result: any;
+  result = await Graph.findAll({
+    raw: true,
+  });
+  return result;
+}
