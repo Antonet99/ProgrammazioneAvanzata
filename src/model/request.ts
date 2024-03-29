@@ -52,13 +52,25 @@ export const Request = sequelize.define(
 
 //get request
 
-export async function getRequests(id_graph: number) {
+export async function getPendingRequests(id_graph: number) {
   let result: any;
   result = await Request.findAll({
     raw: true,
     where: { req_graph: id_graph, req_status: "pending" },
     attributes: {
       exclude: ["req_graph"],
+    },
+  });
+  return result;
+}
+
+export async function getGraphRequests(id_graph: number) {
+  let result: any;
+  result = await Request.findAll({
+    raw: true,
+    where: { req_graph: id_graph },
+    attributes: {
+      exclude: ["req_graph", "req_users"],
     },
   });
   return result;

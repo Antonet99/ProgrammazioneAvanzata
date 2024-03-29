@@ -46,4 +46,8 @@ router.post("/recharge", Middleware.AUTH, function (req: any, res: any) {
   Controller.rechargeTokens(req, res);
 });
 
+router.post("/getGraphRequests", async function (req: any, res: any) {
+  Controller.getGraphRequest(req, res);
+});
+
 export default router;

@@ -161,7 +161,7 @@ export async function updateWeight(req: any, res: Response) {
 
 export async function getPendingRequests(req: any, res: any) {
   let id_graph = req.body.id_graph;
-  let result = await UpdateRequest.getRequests(id_graph);
+  let result = await UpdateRequest.getPendingRequests(id_graph);
 
   res.status(200).send(result);
 }
@@ -349,5 +349,50 @@ export async function rechargeTokens(req: any, res: any) {
     res.status(200).send("Ricarica dei token effettuata");
   } catch (error) {
     res.status(500).send("Errore nella ricarica dei token");
+  }
+}
+
+/* Restituire l’elenco degli aggiornamenti in formato JSON, 
+dei pesi di un dato modello eventualmente filtrando per Data di modifica
+e specificando o la data di fine, o la data di inizio o entrambe */
+
+export async function getUpdateRequests(startDate?: Date, endDate?: Date) {
+  let whereCondition = {};
+  const Op = sequelize.Op;
+
+  if (startDate && endDate) {
+    whereCondition = {
+      timestamp: {
+        [Op.between]: [startDate, endDate],
+      },
+    };
+  } else if (startDate) {
+    whereCondition = {
+      timestamp: {
+        [Op.gte]: startDate,
+      },
+    };
+  } else if (endDate) {
+    whereCondition = {
+      timestamp: {
+        [Op.lte]: endDate,
+      },
+    };
+  }
+
+  try {
+    let updates = await UpdateRequest.Request.findAll({
+      where: whereCondition,
+    });
+    return updates;
+  } catch (error) {}
+}
+
+export async function getGraphRequest(req: any, res: any) {
+  try {
+    let result = await UpdateRequest.getGraphRequests(req.body.id_graph);
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send("Errore nella funzione");
   }
 }
