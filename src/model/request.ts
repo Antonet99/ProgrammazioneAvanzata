@@ -21,11 +21,11 @@ export const Request = sequelize.define(
       type: DataTypes.JSONB,
       allowNull: false,
     },
-    costo: {
+    req_cost: {
       type: DataTypes.REAL,
       allowNull: false,
     },
-    date_time: {
+    timestamp: {
       type: DataTypes.DATE,
     },
     req_users: {

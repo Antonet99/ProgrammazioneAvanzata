@@ -14,6 +14,9 @@ CREATE TABLE users (
 INSERT INTO users (username, email)
 VALUES ('user1', 'user1@email.com');
 
+INSERT INTO users (username, email)
+VALUES ('user2', 'user2@email.com');
+
 INSERT INTO users (username, email, role)
 VALUES ('admin1', 'admin1@email.com', 'admin');
 
@@ -24,7 +27,7 @@ CREATE TABLE graph (
     nodes INTEGER,
     edges INTEGER,
     graph_cost REAL,
-    date_time DATE,
+    timestamp TIMESTAMP,
     id_creator INTEGER REFERENCES users(id_user)
 );
 
@@ -34,7 +37,7 @@ CREATE TABLE request (
     req_status TEXT,
     metadata JSONB,
     req_cost REAL,
-    date_time DATE, --DATETIME
+    timestamp TIMESTAMP,
     req_users INTEGER REFERENCES users(id_user),
     req_graph INTEGER REFERENCES graph(id_graph)
 );

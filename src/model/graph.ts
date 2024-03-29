@@ -22,10 +22,10 @@ export const Graph = sequelize.define(
     edges: {
       type: DataTypes.INTEGER,
     },
-    costo: {
+    graph_cost: {
       type: DataTypes.REAL,
     },
-    date_time: {
+    timestamp: {
       type: DataTypes.DATE,
     },
     id_creator: {

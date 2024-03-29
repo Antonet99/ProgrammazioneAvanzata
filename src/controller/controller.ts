@@ -22,8 +22,8 @@ export async function createGraph(req: any, res: Response) {
       graph: JSON.stringify(graph),
       nodes: nodes,
       edges: edges,
-      costo: parseFloat(total_cost.toFixed(3)),
-      date_time: sequelize.literal("CURRENT_TIMESTAMP"),
+      graph_cost: parseFloat(total_cost.toFixed(3)),
+      timestamp: new Date(),
       id_creator: parseInt(user.id_user),
     };
 
@@ -88,16 +88,16 @@ export async function updateWeight(req: any, res: Response) {
 
     //update pesi nelle richieste
     //for (let i in data) {
-      //let start: string = data[i]["start"]; //A
-      //let end: string = data[i]["end"]; // B
-      //let new_weight = data[i]["weight"];
-      //let old_weight = graph[start][end]; // qui try catch in caso non esiste l'arco sul grafo
+    //let start: string = data[i]["start"]; //A
+    //let end: string = data[i]["end"]; // B
+    //let new_weight = data[i]["weight"];
+    //let old_weight = graph[start][end]; // qui try catch in caso non esiste l'arco sul grafo
 
-      //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
-      //data[i]["weight"] = graph[start][end] = Utils.exp_avg(
-      //  old_weight,
-      //  new_weight
-      //);
+    //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
+    //data[i]["weight"] = graph[start][end] = Utils.exp_avg(
+    //  old_weight,
+    //  new_weight
+    //);
     //  costo_richiesta += 0.025;
     //}
 
@@ -122,8 +122,8 @@ export async function updateWeight(req: any, res: Response) {
     await UpdateRequest.Request.create({
       req_status: "accepted",
       metadata: data,
-      costo: costo_richiesta,
-      date_time: sequelize.literal("CURRENT_TIMESTAMP"),
+      req_cost: costo_richiesta,
+      timestamp: new Date(),
       req_users: user.id_user,
       req_graph: graph_id,
     });
@@ -134,13 +134,13 @@ export async function updateWeight(req: any, res: Response) {
     //let costo_richiesta = 0;
 
     //for (let i in data) {
-      //let start: string = data[i]["start"];
-      //let end: string = data[i]["end"];
-      //let new_weight = data[i]["weight"];
-      //let old_weight = graph[start][end] as number; // qui try catch in caso non esiste l'arco sul grafo
+    //let start: string = data[i]["start"];
+    //let end: string = data[i]["end"];
+    //let new_weight = data[i]["weight"];
+    //let old_weight = graph[start][end] as number; // qui try catch in caso non esiste l'arco sul grafo
 
-      //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
-      //data[i]["weight"] = Utils.exp_avg(old_weight, new_weight);
+    //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
+    //data[i]["weight"] = Utils.exp_avg(old_weight, new_weight);
     //  costo_richiesta += 0.025;
     //}
 
@@ -149,8 +149,8 @@ export async function updateWeight(req: any, res: Response) {
     UpdateRequest.Request.create({
       req_status: "pending",
       metadata: data,
-      costo: costo_richiesta,
-      date_time: sequelize.literal("CURRENT_TIMESTAMP"),
+      req_cost: costo_richiesta,
+      timestamp: new Date(),
       req_users: user.id_user,
       req_graph: graph_id,
     });
@@ -290,16 +290,19 @@ export async function acceptRequest(req: any, res: any) {
         );
 
         //il problema è l'indice di metadata, viene accettata solo la prima
-        let start = list_req[i].metadata[i].start;
-        let end = list_req[i].metadata[i].end;
-        let weight = list_req[i].metadata[i].weight;
-        let graph = JSON.parse(graph_req[i].graph);
-        console.log(
-          list_req[i].metadata[i],
-          typeof list_req[i].metadata[i],
-          typeof list_req[i].metadata
-        );
-        graph[start][end] = weight; //qui try catch in caso non esiste l'arco sul grafo
+        for (let j in list_req[i].metadata) {
+          let start = list_req[i].metadata[j].start;
+          let end = list_req[i].metadata[j].end;
+          let weight = list_req[i].metadata[j].weight;
+          var graph = JSON.parse(graph_req[i].graph);
+          console.log(
+            list_req[i].metadata[j],
+            typeof list_req[i].metadata[j],
+            typeof list_req[i].metadata
+          );
+          graph[start][end] = Utils.exp_avg(graph[start][end], weight);
+        }
+        //qui try catch in caso non esiste l'arco sul grafo
 
         await Graph.update(
           {
