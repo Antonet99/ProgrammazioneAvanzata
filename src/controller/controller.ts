@@ -87,23 +87,25 @@ export async function updateWeight(req: any, res: Response) {
 
   let data = requests_b["data"];
 
+  let costo_richiesta = Object.keys(data).length * 0.025;
+
   if (user.id_user == graph_obj.id_creator) {
-    let costo_richiesta = 0;
+    //let costo_richiesta = 0;
 
     //update pesi nelle richieste
-    for (let i in data) {
-      let start: string = data[i]["start"]; //A
-      let end: string = data[i]["end"]; // B
-      let new_weight = data[i]["weight"];
-      let old_weight = graph[start][end]; // qui try catch in caso non esiste l'arco sul grafo
+    //for (let i in data) {
+      //let start: string = data[i]["start"]; //A
+      //let end: string = data[i]["end"]; // B
+      //let new_weight = data[i]["weight"];
+      //let old_weight = graph[start][end]; // qui try catch in caso non esiste l'arco sul grafo
 
       //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
-      data[i]["weight"] = graph[start][end] = Utils.exp_avg(
-        old_weight,
-        new_weight
-      );
-      costo_richiesta += 0.025;
-    }
+      //data[i]["weight"] = graph[start][end] = Utils.exp_avg(
+      //  old_weight,
+      //  new_weight
+      //);
+    //  costo_richiesta += 0.025;
+    //}
 
     //check se ho i tokens e li sottraggo anche
     if (user.tokens < costo_richiesta) {
@@ -135,18 +137,18 @@ export async function updateWeight(req: any, res: Response) {
     await tokenUpdate(user.tokens - costo_richiesta, user.username);
     res.status(200).send("Richiesta accettata");
   } else {
-    let costo_richiesta = 0;
+    //let costo_richiesta = 0;
 
-    for (let i in data) {
-      let start: string = data[i]["start"];
-      let end: string = data[i]["end"];
-      let new_weight = data[i]["weight"];
-      let old_weight = graph[start][end] as number; // qui try catch in caso non esiste l'arco sul grafo
+    //for (let i in data) {
+      //let start: string = data[i]["start"];
+      //let end: string = data[i]["end"];
+      //let new_weight = data[i]["weight"];
+      //let old_weight = graph[start][end] as number; // qui try catch in caso non esiste l'arco sul grafo
 
       //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
-      data[i]["weight"] = Utils.exp_avg(old_weight, new_weight);
-      costo_richiesta += 0.025;
-    }
+      //data[i]["weight"] = Utils.exp_avg(old_weight, new_weight);
+    //  costo_richiesta += 0.025;
+    //}
 
     //check se ha abbastanza token e NON li sottraggo, li sottraggo quando la richiesta verrà accettata
 
@@ -250,7 +252,7 @@ export async function acceptRequest(req: any, res: any) {
 
   for (let i in graph_req) {
     let id_creator = graph_req[i].id_creator;
-    console.log(typeof id_creator, typeof id_user);
+    //console.log(typeof id_creator, typeof id_user);
     if (id_user != id_creator) {
       res.status(500).send("Non sei il creatore del grafo");
       return;
