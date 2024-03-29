@@ -75,3 +75,11 @@ export async function tokenUpdate(newToken: Number, username: string) {
     }
   );
 }
+
+export async function getRole(username: string) {
+  const role = await User.findOne({
+    attributes: ["role"],
+    where: { username: username },
+  });
+  return role;
+}

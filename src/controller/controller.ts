@@ -1,5 +1,5 @@
 import { getUser, getUserById, tokenUpdate } from "../model/users";
-import { Graph, insertGraph, getGraphById } from "../model/graph";
+import { Graph, insertGraph, getGraphById, getGraph } from "../model/graph";
 import * as UpdateRequest from "../model/request";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
@@ -39,20 +39,14 @@ export async function createGraph(req: any, res: Response) {
   }
 }
 
-export async function getGraph(req: any, res: any) {
-  //let result: any;
-  let result: any = await Graph.findAll({
-    raw: true,
-    attributes: ["id_graph", "nodes", "edges", "costo", "id_creator"],
-    //include: [{ model: User, attributes: ["username"], required: true }],
-  }).catch((error) => {
-    res.status(500).send("Errore nella funzione getGraph");
-  });
-
-  res.status(200).send(result);
+export async function getGraphs(req: any, res: any) {
+  try {
+    let result = await getGraph();
+    res.status(200).send(result);
+  } catch (error) {
+    res.status(500).send("Errore nella funzione");
+  }
 }
-
-//aggiungere costo richiesta a tabella request
 
 //nel body id grafo, "graph_id":3, "data" : [{"start":"A","end":"B", "weight":3}, {...}]
 export async function updateWeight(req: any, res: Response) {
@@ -339,6 +333,11 @@ export async function rechargeTokens(req: any, res: any) {
     return;
   } else if (!user) {
     res.status(500).send("Utente non trovato");
+    return;
+  }
+
+  if (amount <= 0) {
+    res.status(500).send("Importo negativo/pari a zero non valido");
     return;
   }
 

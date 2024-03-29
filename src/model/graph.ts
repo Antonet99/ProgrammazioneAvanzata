@@ -62,6 +62,7 @@ export async function getGraph() {
   let result: any;
   result = await Graph.findAll({
     raw: true,
+    attributes: ["id_graph", "nodes", "edges", "graph_cost", "id_creator"],
   });
   return result;
 }

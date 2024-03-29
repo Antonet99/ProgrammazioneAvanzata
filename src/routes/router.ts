@@ -14,7 +14,7 @@ router.post(
 );
 
 router.get("/getGraph", async function (req: any, res: any) {
-  Controller.getGraph(req, res);
+  Controller.getGraphs(req, res);
 });
 
 router.post(
