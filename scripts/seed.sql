@@ -1,5 +1,5 @@
 CREATE DATABASE pa;
-\c pa2
+\c pa
 
 CREATE TYPE user_role AS ENUM ('admin', 'user');
 CREATE TYPE request_status AS ENUM ('pending', 'accepted', 'rejected'); 
