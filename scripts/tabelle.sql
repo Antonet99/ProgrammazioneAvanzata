@@ -2,6 +2,7 @@ CREATE DATABASE pa;
 \c pa2
 
 CREATE TYPE user_role AS ENUM ('admin', 'user');
+CREATE TYPE request_status AS ENUM ('pending', 'accepted', 'rejected'); 
 
 CREATE TABLE users (
     id_user SERIAL PRIMARY KEY,
@@ -34,7 +35,7 @@ CREATE TABLE graph (
 --RICHIESTE AGGIORNAMENTO
 CREATE TABLE request (
     id_request SERIAL PRIMARY KEY,
-    req_status TEXT,
+    req_status request_status,
     metadata JSONB,
     req_cost REAL,
     timestamp TIMESTAMP,

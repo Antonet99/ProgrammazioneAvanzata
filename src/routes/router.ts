@@ -26,9 +26,13 @@ router.post(
   }
 );
 
-router.post("/getPendingRequests", async function (req: any, res: any) {
-  Controller.getPendingRequests(req, res);
-});
+router.post(
+  "/getPendingRequests",
+  Middleware.AUTH,
+  async function (req: any, res: any) {
+    Controller.getPendingRequests(req, res);
+  }
+);
 
 router.post(
   "/executeModel",
@@ -46,8 +50,22 @@ router.post("/recharge", Middleware.AUTH, function (req: any, res: any) {
   Controller.rechargeTokens(req, res);
 });
 
-router.post("/getGraphRequests", async function (req: any, res: any) {
-  Controller.getGraphRequest(req, res);
-});
+router.post(
+  "/getGraphRequests",
+  Middleware.AUTH,
+  Middleware.DATE,
+  Middleware.REQ,
+  async function (req: any, res: any) {
+    Controller.getGraphRequest(req, res);
+  }
+);
+
+router.post(
+  "/simulateModel",
+  Middleware.AUTH,
+  async function (req: any, res: any) {
+    Controller.simulateModel(req, res);
+  }
+);
 
 export default router;

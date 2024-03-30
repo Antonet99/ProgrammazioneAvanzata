@@ -352,47 +352,103 @@ export async function rechargeTokens(req: any, res: any) {
   }
 }
 
-/* Restituire l’elenco degli aggiornamenti in formato JSON, 
-dei pesi di un dato modello eventualmente filtrando per Data di modifica
-e specificando o la data di fine, o la data di inizio o entrambe */
-
-export async function getUpdateRequests(startDate?: Date, endDate?: Date) {
-  let whereCondition = {};
-  const Op = sequelize.Op;
-
-  if (startDate && endDate) {
-    whereCondition = {
-      timestamp: {
-        [Op.between]: [startDate, endDate],
-      },
-    };
-  } else if (startDate) {
-    whereCondition = {
-      timestamp: {
-        [Op.gte]: startDate,
-      },
-    };
-  } else if (endDate) {
-    whereCondition = {
-      timestamp: {
-        [Op.lte]: endDate,
-      },
-    };
-  }
-
-  try {
-    let updates = await UpdateRequest.Request.findAll({
-      where: whereCondition,
-    });
-    return updates;
-  } catch (error) {}
-}
-
 export async function getGraphRequest(req: any, res: any) {
+  let startDate = req.body.startDate;
+  let endDate = req.body.endDate;
+  let reqStatus = req.body.status;
+
   try {
-    let result = await UpdateRequest.getGraphRequests(req.body.id_graph);
-    res.status(200).send(result);
+    let dateCondition = Utils.getDateCondition(startDate, endDate);
+    let statusCondition = Utils.getReqStatusCondition(reqStatus);
+
+    if (statusCondition) {
+      let result = await UpdateRequest.getGraphRequests(
+        req.body.id_graph,
+        dateCondition,
+        reqStatus
+      );
+      res.status(200).send(result);
+    } else {
+      let result = await UpdateRequest.getGraphRequests(
+        req.body.id_graph,
+        dateCondition
+      );
+      res.status(200).send(result);
+    }
   } catch (error) {
     res.status(500).send("Errore nella funzione");
   }
+}
+
+/* {
+  "id_graph": 1,
+  "options": {
+      "start": 1,
+      "stop" : 2,
+      "step": 0.05 
+  },
+  "route": {
+      "start": "A",
+      "goal": "D"
+  },
+  "edge": {
+      "node1": "A",
+      "node2": "B"
+  }
+} */
+
+/* Effettuare una “simulazione” che consenta di variare il peso relativo 
+ad un arco specificando il valore di inizio, fine 
+ed il passo di incremento (es. start = 1 stop = 2 e passo 0.05 */
+
+/* È necessario ritornare l’elenco di tutti i risultati; 
+ritornare anche il best result con la relativa
+configurazione dei pesi che sono stati usati. */
+
+export async function simulateModel(req: any, res: any) {
+  let id_graph: number = req.body.id_graph;
+  let options = req.body.options;
+  let route = req.body.route;
+  let edge = req.body.edge;
+
+  let graph_obj = await getGraphById(id_graph);
+  let graph = JSON.parse(graph_obj.graph);
+
+  let start: number = options.start;
+  let stop: number = options.stop;
+  let step: number = options.step;
+
+  let list = [];
+
+  let bg = new GraphD(graph);
+  let execute = bg.path(route.start, route.goal, { cost: true });
+
+  let best = {
+    Percorso: execute.path,
+    Costo: parseFloat(execute.cost.toFixed(3)),
+    Peso: parseFloat(graph[edge.node1][edge.node2].toFixed(3)),
+    Grafo: graph,
+  };
+
+  for (let i = start + step; i <= stop + step; i += step) {
+    graph[edge.node1][edge.node2] = i;
+    let g = new GraphD(graph);
+    let execute = g.path(route.start, route.goal, { cost: true });
+
+    let result = {
+      Percorso: execute.path,
+      Costo: parseFloat(execute.cost.toFixed(3)),
+      Peso: parseFloat(i.toFixed(3)),
+    };
+
+    list.push(result);
+
+    if (execute.cost < best.Costo) {
+      (best.Percorso = result.Percorso),
+        (best.Costo = result.Costo),
+        (best.Peso = result.Peso),
+        (best.Grafo = graph);
+    }
+  }
+  res.status(200).json({ best: best, list: list });
 }

@@ -64,14 +64,49 @@ export async function getPendingRequests(id_graph: number) {
   return result;
 }
 
-export async function getGraphRequests(id_graph: number) {
+export async function getGraphRequests(
+  id_graph: number,
+  dateCondition: any,
+  req_status?: string
+) {
   let result: any;
-  result = await Request.findAll({
-    raw: true,
-    where: { req_graph: id_graph },
-    attributes: {
-      exclude: ["req_graph", "req_users"],
-    },
-  });
+
+  if (Object.keys(dateCondition).length === 0 && !req_status) {
+    result = await Request.findAll({
+      raw: true,
+      where: { req_graph: id_graph },
+      attributes: {
+        exclude: ["req_graph"],
+      },
+    });
+  } else if (Object.keys(dateCondition).length === 0 && req_status) {
+    result = await Request.findAll({
+      raw: true,
+      where: { req_graph: id_graph, req_status: req_status },
+      attributes: {
+        exclude: ["req_graph"],
+      },
+    });
+  } else if (Object.keys(dateCondition).length !== 0 && req_status) {
+    result = await Request.findAll({
+      raw: true,
+      where: {
+        req_graph: id_graph,
+        timestamp: dateCondition.timestamp,
+        req_status: req_status,
+      },
+      attributes: {
+        exclude: ["req_graph"],
+      },
+    });
+  } else if (Object.keys(dateCondition).length !== 0 && !req_status) {
+    result = await Request.findAll({
+      raw: true,
+      where: { req_graph: id_graph, timestamp: dateCondition.timestamp },
+      attributes: {
+        exclude: ["req_graph"],
+      },
+    });
+  }
   return result;
 }

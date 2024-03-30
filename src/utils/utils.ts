@@ -1,3 +1,5 @@
+import sequelize from "sequelize";
+
 require("dotenv").config();
 
 export var alpha: number;
@@ -41,4 +43,42 @@ export function checkAlpha() {
 
 export function exp_avg(old_weight: number, new_weight: number): number {
   return alpha * old_weight + (1 - alpha) * new_weight;
+}
+
+export function getDateCondition(startDate?: Date, endDate?: Date) {
+  let whereCondition = {};
+  const Op = sequelize.Op;
+
+  if (startDate && endDate) {
+    whereCondition = {
+      timestamp: {
+        [Op.between]: [startDate, endDate],
+      },
+    };
+  } else if (startDate) {
+    whereCondition = {
+      timestamp: {
+        [Op.gte]: startDate,
+      },
+    };
+  } else if (endDate) {
+    whereCondition = {
+      timestamp: {
+        [Op.lte]: endDate,
+      },
+    };
+  }
+  return whereCondition;
+}
+
+export function getReqStatusCondition(req_status: string) {
+  if (!req_status) {
+    return false;
+  }
+
+  if (req_status == "accepted" || req_status == "denied") {
+    return true;
+  }
+
+  return false;
 }

@@ -40,8 +40,13 @@ export function validateGraph(
 
   // Verifica che tutti i pesi degli archi siano numeri non negativi
   for (const node in graph) {
-    for (const edge in graph[node]) { //node == edge per verificare autocicli (A : {A : 1})
-      if (typeof graph[node][edge] !== "number" || graph[node][edge] < 0 || node == edge) {
+    for (const edge in graph[node]) {
+      //node == edge per verificare autocicli (A : {A : 1})
+      if (
+        typeof graph[node][edge] !== "number" ||
+        graph[node][edge] < 0 ||
+        node == edge
+      ) {
         res
           .status(400)
           .json({ error: `Peso dell'arco ${graph[node][edge]} non valido` });
@@ -49,7 +54,6 @@ export function validateGraph(
       }
     }
   }
-
 
   next();
 }
@@ -87,5 +91,60 @@ export async function validateUpdateRequest(
     return;
   }
 
+  next();
+}
+
+export function validateDate(req: any, res: any, next: any) {
+  const id_graph = req.body.id_graph;
+  const startDate = req.body.startDate;
+  const endDate = req.body.endDate;
+
+  if (typeof id_graph !== "number" || id_graph <= 0) {
+    res
+      .status(400)
+      .send({ error: "id_graph deve essere un numero/numero positivo." });
+    return;
+  }
+
+  if (startDate && endDate) {
+    if (!Date.parse(startDate)) {
+      res.status(400).send({ error: "startDate deve essere una data valida." });
+      return;
+    }
+    if (!Date.parse(endDate)) {
+      res.status(400).send({ error: "endDate deve essere una data valida." });
+      return;
+    }
+    if (new Date(startDate) >= new Date(endDate)) {
+      res
+        .status(400)
+        .send({ error: "startDate deve essere prima di endDate." });
+      return;
+    }
+  }
+
+  if (startDate && !endDate) {
+    if (!Date.parse(startDate)) {
+      res.status(400).send({ error: "startDate deve essere una data valida." });
+      return;
+    }
+  } else if (!startDate && endDate) {
+    if (!Date.parse(endDate)) {
+      res.status(400).send({ error: "endDate deve essere una data valida." });
+      return;
+    }
+  }
+  next();
+}
+
+export async function validateReqStatus(req: any, res: any, next: any) {
+  const req_status = req.body.status;
+
+  if (req_status && req_status != "accepted" && req_status != "denied") {
+    res
+      .status(400)
+      .send({ error: "status deve essere 'accepted' o 'denied'." });
+    return;
+  }
   next();
 }
