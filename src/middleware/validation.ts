@@ -148,3 +148,66 @@ export async function validateReqStatus(req: any, res: any, next: any) {
   }
   next();
 }
+
+export async function validateSimulation(req: any, res: any, next: any) {
+  let id_graph: number = req.body.id_graph;
+  let options = req.body.options;
+  let route = req.body.route;
+  let edge = req.body.edge;
+
+  let start: number = options.start;
+  let stop: number = options.stop;
+  let step: number = options.step;
+
+  if (typeof id_graph !== "number" || id_graph <= 0) {
+    res
+      .status(400)
+      .send({ error: "id_graph deve essere un numero/numero positivo." });
+    return;
+  }
+
+  if (typeof start !== "number" || start < 0) {
+    res.status(400).send({ error: "start deve essere un numero positivo." });
+    return;
+  }
+
+  if ((typeof stop !== "number" || stop < 0) && stop < start) {
+    res.status(400).send({ error: "stop deve essere un numero positivo." });
+    return;
+  }
+
+  if (start == stop) {
+    res.status(400).send({ error: "start e stop non possono essere uguali." });
+    return;
+  }
+
+  if ((typeof step !== "number" || step <= 0) && step > start - stop) {
+    res.status(400).send({ error: "step deve essere un numero positivo." });
+    return;
+  }
+
+  if (
+    (!route.start || !route.goal) &&
+    typeof route.start !== "string" &&
+    typeof route.goal !== "string"
+  ) {
+    res
+      .status(400)
+      .send({ error: "start e end devono essere una stringa non vuota." });
+    return;
+  }
+
+  if (typeof edge.node1 !== "string" && typeof edge.node2 !== "string") {
+    res
+      .status(400)
+      .send({ error: "node1 e node2 devono essere una stringa non vuota." });
+    return;
+  }
+
+  if (edge.node1 == edge.node2) {
+    res.status(400).send({ error: "node1 e node2 non possono essere uguali." });
+    return;
+  }
+
+  next();
+}

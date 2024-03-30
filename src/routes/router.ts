@@ -63,6 +63,7 @@ router.post(
 router.post(
   "/simulateModel",
   Middleware.AUTH,
+  Middleware.SIM,
   async function (req: any, res: any) {
     Controller.simulateModel(req, res);
   }

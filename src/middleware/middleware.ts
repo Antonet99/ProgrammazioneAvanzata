@@ -14,3 +14,5 @@ export const UPDATE = [validation.validateUpdateRequest];
 
 export const DATE = [validation.validateDate];
 export const REQ = [validation.validateReqStatus];
+
+export const SIM = [validation.validateSimulation];

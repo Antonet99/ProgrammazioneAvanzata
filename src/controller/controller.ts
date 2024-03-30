@@ -270,10 +270,11 @@ export async function acceptRequest(req: any, res: any) {
   }
 
   for (let i in list_req) {
+    console.log(list_user[i].tokens, list_req[i].req_cost);
     if (accepted[parseInt(i)]) {
-      if (list_user[i].tokens >= list_req[i].costo) {
+      if (list_user[i].tokens >= list_req[i].req_cost) {
         await tokenUpdate(
-          list_user[i].tokens - list_req[i].costo,
+          list_user[i].tokens - list_req[i].req_cost,
           list_user[i].username
         );
 
@@ -379,31 +380,6 @@ export async function getGraphRequest(req: any, res: any) {
     res.status(500).send("Errore nella funzione");
   }
 }
-
-/* {
-  "id_graph": 1,
-  "options": {
-      "start": 1,
-      "stop" : 2,
-      "step": 0.05 
-  },
-  "route": {
-      "start": "A",
-      "goal": "D"
-  },
-  "edge": {
-      "node1": "A",
-      "node2": "B"
-  }
-} */
-
-/* Effettuare una “simulazione” che consenta di variare il peso relativo 
-ad un arco specificando il valore di inizio, fine 
-ed il passo di incremento (es. start = 1 stop = 2 e passo 0.05 */
-
-/* È necessario ritornare l’elenco di tutti i risultati; 
-ritornare anche il best result con la relativa
-configurazione dei pesi che sono stati usati. */
 
 export async function simulateModel(req: any, res: any) {
   let id_graph: number = req.body.id_graph;
