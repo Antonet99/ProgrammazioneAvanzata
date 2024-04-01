@@ -4,7 +4,18 @@ import HttpStatusCode from "./http_status_code";
 export function sendResponse(
   res: any,
   status: HttpStatusCode,
-  message: Messages
+  message?: Messages,
+  obj? : object
 ) {
-  res.status(status).json({ message: message });
+
+  if(message){
+    res.status(status).json({ message: message });
+    return;
+  }
+
+  if(obj){
+    res.status(status).json(obj);
+  }
+
+  
 }

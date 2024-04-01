@@ -8,6 +8,7 @@ import HttpStatusCode from "../utils/http_status_code";
 import Message from "../utils/messages_string";
 
 import * as SeqDb from "../singleton/sequelize";
+import { send } from "process";
 
 const GraphD = require("node-dijkstra");
 
@@ -59,9 +60,11 @@ export async function createGraph(req: any, res: Response) {
 export async function getGraphs(req: any, res: any) {
   try {
     let result = await getGraph();
-    res.status(200).send(result);
+    sendResponse(res, HttpStatusCode.OK, undefined ,result);
+    //res.status(200).send(result);
   } catch (error) {
-    res.status(500).send("Errore nella funzione");
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR, Message.DEFAULT_ERROR);
+    //res.status(500).send("Errore nella funzione");
   }
 }
 
@@ -76,7 +79,8 @@ export async function updateWeight(req: any, res: Response) {
       throw new Error("Username non trovato");
     }
   } catch (error: any) {
-    res.status(500).send(error.message);
+    //res.status(500).send(error.message);
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_NOT_FOUND);
     return;
   }
 
@@ -86,12 +90,15 @@ export async function updateWeight(req: any, res: Response) {
       throw new Error("Graph id non trovato");
     }
   } catch (error: any) {
-    res.status(500).send(error.message);
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.GRAPH_NOT_FOUND);
+    //res.status(500).send(error.message);
     return;
   }
 
   const graph_obj: any = await getGraphById(graph_id).catch((error) => {
-    res.status(500).send("Errore nella funzione update");
+    //res.status(500).send("Errore nella funzione update");
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    return;
   });
 
   const graph = JSON.parse(graph_obj.graph);
@@ -103,7 +110,8 @@ export async function updateWeight(req: any, res: Response) {
   if (user.id_user == graph_obj.id_creator) {
     //check se ho i tokens e li sottraggo anche
     if (user.tokens < costo_richiesta) {
-      res.status(500).send("Token insufficienti");
+      sendResponse(res,HttpStatusCode.UNAUTHORIZED, Message.insufficientBalance_message);
+      //res.status(500).send("Token insufficienti");
       return;
     }
 
@@ -138,11 +146,13 @@ export async function updateWeight(req: any, res: Response) {
       );
 
       await tokenUpdate(user.tokens - costo_richiesta, user.username, tr);
-      res.status(200).send("Richiesta accettata");
+      //res.status(200).send("Richiesta accettata");
+      sendResponse(res, HttpStatusCode.OK, Message.EDGE_UPDATED);
       await tr.commit();
     } catch (error) {
       await tr.rollback();
-      res.status(500).send("errore creazione richiesta");
+      sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+      //res.status(500).send("errore creazione richiesta");
       return;
     }
   } else {
@@ -157,10 +167,12 @@ export async function updateWeight(req: any, res: Response) {
         req_graph: graph_id,
       });
     } catch (error) {
-      res.status(500).send("errore creazione richiesta");
+      //res.status(500).send("errore creazione richiesta");
+      sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR, Message.REQUEST_CREATE_ERROR);
       return;
     }
-    res.status(200).send("Richiesta in attesa");
+    sendResponse(res, HttpStatusCode.OK, Message.PENDING_REQUEST);
+    //res.status(200).send("Richiesta in attesa");
   }
 } //ci vuole enum per request status
 
@@ -168,7 +180,8 @@ export async function getPendingRequests(req: any, res: any) {
   let id_graph = req.body.id_graph;
   let result = await UpdateRequest.getPendingRequests(id_graph);
 
-  res.status(200).send(result);
+  //res.status(200).send(result);
+  sendResponse(res, HttpStatusCode.OK, undefined, result);
 }
 
 export async function executeModel(req: any, res: any) {
@@ -176,11 +189,16 @@ export async function executeModel(req: any, res: any) {
   let start = req.body.start;
   let goal = req.body.goal;
 
-  let user = await getUser(req.username);
+  try{
+    var user = await getUser(req.username);
 
-  let graph_obj = await getGraphById(id_graph);
+    var graph_obj = await getGraphById(id_graph);
+  }
+  catch(error){
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_GRAPH_NOT_FOUND);
+  }
+
   let graph = JSON.parse(graph_obj.graph);
-
   const route = new GraphD(graph);
 
   const tr = await SeqDb.SequelizeDB.getConnection().transaction();
@@ -201,14 +219,14 @@ export async function executeModel(req: any, res: any) {
       "Tempo di esecuzione": parseFloat(executionTime.toFixed(4)),
     };
 
-    res.status(200).send(result);
+    sendResponse(res, HttpStatusCode.OK, undefined, result);
+    //res.status(200).send(result);
 
     await tokenUpdate(user.tokens - graph_obj.costo, user.username, tr);
     await tr.commit();
   } catch (error: any) {
-    res
-      .status(500)
-      .send("Errore nell'esecuzione del modello: " + error.message);
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR, Message.MODEL_EXECUTION_ERROR);
+    //res.status(500).send("Errore nell'esecuzione del modello: " + error.message);
     tr.rollback();
   }
 }
@@ -218,7 +236,8 @@ export async function acceptRequest(req: any, res: any) {
   let accepted: boolean[] = req.body.accepted;
 
   if (id_request.length != accepted.length) {
-    res.status(500).send("Errore nei parametri");
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.malformedPayload_message);
+    //res.status(500).send("Errore nei parametri");
     return;
   }
 
@@ -257,7 +276,8 @@ export async function acceptRequest(req: any, res: any) {
     let id_creator = graph_req[i].id_creator;
     //console.log(typeof id_creator, typeof id_user);
     if (id_user != id_creator) {
-      res.status(500).send("Non sei il creatore del grafo");
+      //res.status(500).send("Non sei il creatore del grafo");
+      sendResponse(res, HttpStatusCode.UNAUTHORIZED, Message.REQUEST_USER_UNAUTHORIZED_GRAPH, {unathorized_graph_id : graph_req[i].id_graph });
       return;
     }
   }
@@ -309,11 +329,11 @@ export async function acceptRequest(req: any, res: any) {
           let end = list_req[i].metadata[j].end;
           let weight = list_req[i].metadata[j].weight;
           var graph = JSON.parse(graph_req[i].graph);
-          console.log(
+          /*console.log(
             list_req[i].metadata[j],
             typeof list_req[i].metadata[j],
             typeof list_req[i].metadata
-          );
+          );*/
           graph[start][end] = Utils.exp_avg(graph[start][end], weight);
         }
         //qui try catch in caso non esiste l'arco sul grafo
@@ -330,14 +350,14 @@ export async function acceptRequest(req: any, res: any) {
           }
         );
       } else {
-        res
-          .status(500)
-          .send(`L'utente ${list_user[i].username} ha token insufficienti`);
+        //res.status(500).send(`L'utente ${list_user[i].username} ha token insufficienti`);
+        sendResponse(res, HttpStatusCode.UNAUTHORIZED, Message.insufficientBalance_message, {username : list_user[i].username});
         return;
       }
     }
   }
-  res.status(200).send("Richieste accettate/rifiutate");
+  //res.status(200).send("Richieste accettate/rifiutate");
+  sendResponse(res, HttpStatusCode.OK, Message.ACCEPTED_DENIED_REQUEST);
 }
 
 export async function rechargeTokens(req: any, res: any) {
@@ -346,15 +366,20 @@ export async function rechargeTokens(req: any, res: any) {
   let amount = req.body.amount;
 
   if (!admin || admin.role != "admin") {
-    res.status(500).send("Utente admin non trovato");
+    //res.status(500).send("Utente admin non trovato");
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.ADMIN_NOT_FOUND);
     return;
-  } else if (!user) {
-    res.status(500).send("Utente non trovato");
+  } 
+
+  if (!user) {
+    //res.status(500).send("Utente non trovato");
+    sendResponse(res,HttpStatusCode.NOT_FOUND, Message.USER_NOT_FOUND);
     return;
   }
 
   if (amount <= 0) {
-    res.status(500).send("Importo negativo/pari a zero non valido");
+    //res.status(500).send("Importo negativo/pari a zero non valido");
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.INVALID_IMPORT);
     return;
   }
 
@@ -362,10 +387,12 @@ export async function rechargeTokens(req: any, res: any) {
 
   try {
     await tokenUpdate(user.tokens + amount, user.username, tr);
-    res.status(200).send("Ricarica dei token effettuata");
+    //res.status(200).send("Ricarica dei token effettuata");
+    sendResponse(res, HttpStatusCode.OK, Message.TOKENS_RECHARGED);
     await tr.commit();
   } catch (error) {
-    res.status(500).send("Errore nella ricarica dei token");
+    //res.status(500).send("Errore nella ricarica dei token");
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR, Message.RECHARGE_FAIL);
     await tr.rollback();
   }
 }
@@ -385,16 +412,19 @@ export async function getGraphRequest(req: any, res: any) {
         dateCondition,
         reqStatus
       );
-      res.status(200).send(result);
+      //res.status(200).send(result);
+      sendResponse(res, HttpStatusCode.OK, undefined, result);
     } else {
       let result = await UpdateRequest.getGraphRequests(
         req.body.id_graph,
         dateCondition
       );
-      res.status(200).send(result);
+      //res.status(200).send(result);
+      sendResponse(res, HttpStatusCode.OK, undefined, result);
     }
   } catch (error) {
-    res.status(500).send("Errore nella funzione");
+    //res.status(500).send("Errore nella funzione");
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -443,5 +473,6 @@ export async function simulateModel(req: any, res: any) {
         (best.Grafo = graph);
     }
   }
-  res.status(200).json({ best: best, list: list });
+  //res.status(200).json({ best: best, list: list });
+  sendResponse(res, HttpStatusCode.OK, undefined, { best: best, list: list });
 }
