@@ -1,6 +1,6 @@
 import { raw } from "express";
 import { SequelizeDB } from "../singleton/sequelize";
-import { Sequelize, DataTypes, where } from "sequelize";
+import { Sequelize, DataTypes, where, Transaction } from "sequelize";
 
 const sequelize = SequelizeDB.getConnection();
 
@@ -65,13 +65,14 @@ export async function checkExistingUser(username: string) {
   return user;
 }
 
-export async function tokenUpdate(newToken: Number, username: string) {
+export async function tokenUpdate(newToken: Number, username: string, tr : Transaction) { //, tr : sequelize.Transaction
   const user = await User.update(
     {
       tokens: newToken,
     },
     {
       where: { username: `${username}` },
+      transaction : tr
     }
   );
 }

@@ -1,6 +1,7 @@
 import { SequelizeDB } from "../singleton/sequelize";
 import { Sequelize, DataTypes } from "sequelize";
 import { User } from "./users";
+import sequelize from "sequelize";
 
 const sequelize = SequelizeDB.getConnection();
 
@@ -43,8 +44,8 @@ export const Graph = sequelize.define(
   }
 );
 
-export async function insertGraph(graph: any) {
-  await Graph.create(graph).catch((error) => {
+export async function insertGraph(graph: any, tr : sequelize.Transaction) { // , tr : sequelize.Transaction
+  await Graph.create(graph, {transaction : tr}).catch((error) => {
     error;
   });
 }

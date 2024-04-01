@@ -18,7 +18,7 @@ services:
   backend:
     build: .
     ports:
-      -3000:3000
+      -3000:3000    #si dovrebbe togliere expose 3000 nel dockerfile
     env_file:
       - .env
     depends_on:

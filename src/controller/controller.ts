@@ -3,6 +3,9 @@ import { Graph, insertGraph, getGraphById, getGraph } from "../model/graph";
 import * as UpdateRequest from "../model/request";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
+
+import * as SeqDb from "../singleton/sequelize";
+
 import sequelize from "sequelize";
 
 const GraphD = require("node-dijkstra");
@@ -26,12 +29,17 @@ export async function createGraph(req: any, res: Response) {
       timestamp: new Date(),
       id_creator: parseInt(user.id_user),
     };
+    
+    //lo passo ad entrambe le funzioni
+    const t = await SeqDb.SequelizeDB.getConnection().transaction();
 
     try {
-      insertGraph(obj);
-      tokenUpdate(user.tokens - total_cost, user.username);
+      insertGraph(obj,t); 
+      tokenUpdate(user.tokens - total_cost, user.username, t);
       res.status(200).send("Grafo creato con successo");
+      await t.commit();
     } catch (error) {
+      await t.rollback();
       res.status(500).send("Errore nella creazione del grafo");
     }
   } else {
@@ -84,22 +92,6 @@ export async function updateWeight(req: any, res: Response) {
   let costo_richiesta = Object.keys(data).length * 0.025;
 
   if (user.id_user == graph_obj.id_creator) {
-    //let costo_richiesta = 0;
-
-    //update pesi nelle richieste
-    //for (let i in data) {
-    //let start: string = data[i]["start"]; //A
-    //let end: string = data[i]["end"]; // B
-    //let new_weight = data[i]["weight"];
-    //let old_weight = graph[start][end]; // qui try catch in caso non esiste l'arco sul grafo
-
-    //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
-    //data[i]["weight"] = graph[start][end] = Utils.exp_avg(
-    //  old_weight,
-    //  new_weight
-    //);
-    //  costo_richiesta += 0.025;
-    //}
 
     //check se ho i tokens e li sottraggo anche
     if (user.tokens < costo_richiesta) {
@@ -107,54 +99,58 @@ export async function updateWeight(req: any, res: Response) {
       return;
     }
 
-    await Graph.update(
-      {
-        graph: JSON.stringify(graph),
-      },
-      {
-        returning: false,
-        where: {
-          id_graph: graph_id,
+    const tr = await SeqDb.SequelizeDB.getConnection().transaction();
+
+    try{
+      await Graph.update(
+        {
+          graph: JSON.stringify(graph),
         },
-      }
-    );
+        {
+          returning: false,
+          where: {
+            id_graph: graph_id,
+          },
+          transaction : tr
+        }
+      );
 
-    await UpdateRequest.Request.create({
-      req_status: "accepted",
-      metadata: data,
-      req_cost: costo_richiesta,
-      timestamp: new Date(),
-      req_users: user.id_user,
-      req_graph: graph_id,
-    });
+      await UpdateRequest.Request.create({
+        req_status: "accepted",
+        metadata: data,
+        req_cost: costo_richiesta,
+        timestamp: new Date(),
+        req_users: user.id_user,
+        req_graph: graph_id,
+      },{
+        transaction : tr
+      });
 
-    await tokenUpdate(user.tokens - costo_richiesta, user.username);
-    res.status(200).send("Richiesta accettata");
+      await tokenUpdate(user.tokens - costo_richiesta, user.username, tr);
+      res.status(200).send("Richiesta accettata");
+      await tr.commit();
+    }catch(error){
+      await tr.rollback();
+      res.status(500).send("errore creazione richiesta");
+      return;
+    }
   } else {
-    //let costo_richiesta = 0;
-
-    //for (let i in data) {
-    //let start: string = data[i]["start"];
-    //let end: string = data[i]["end"];
-    //let new_weight = data[i]["weight"];
-    //let old_weight = graph[start][end] as number; // qui try catch in caso non esiste l'arco sul grafo
-
-    //aggiorno sia il grafo che i dati della richiesta che poi li inserisco le db
-    //data[i]["weight"] = Utils.exp_avg(old_weight, new_weight);
-    //  costo_richiesta += 0.025;
-    //}
-
+    
     //check se ha abbastanza token e NON li sottraggo, li sottraggo quando la richiesta verrà accettata
-
-    UpdateRequest.Request.create({
-      req_status: "pending",
-      metadata: data,
-      req_cost: costo_richiesta,
-      timestamp: new Date(),
-      req_users: user.id_user,
-      req_graph: graph_id,
-    });
-
+    try{
+      UpdateRequest.Request.create({
+        req_status: "pending",
+        metadata: data,
+        req_cost: costo_richiesta,
+        timestamp: new Date(),
+        req_users: user.id_user,
+        req_graph: graph_id,
+      });
+    }
+    catch(error){
+      res.status(500).send("errore creazione richiesta");
+      return;
+    }
     res.status(200).send("Richiesta in attesa");
   }
 } //ci vuole enum per request status
@@ -178,6 +174,8 @@ export async function executeModel(req: any, res: any) {
 
   const route = new GraphD(graph);
 
+  const tr = await SeqDb.SequelizeDB.getConnection().transaction();
+
   try {
     const startTime = performance.now();
     let execute = route.path(start, goal, { cost: true });
@@ -196,11 +194,13 @@ export async function executeModel(req: any, res: any) {
 
     res.status(200).send(result);
 
-    tokenUpdate(user.tokens - graph_obj.costo, user.username);
+    tokenUpdate(user.tokens - graph_obj.costo, user.username, tr);
+    await tr.commit();
   } catch (error: any) {
     res
       .status(500)
       .send("Errore nell'esecuzione del modello: " + error.message);
+      tr.rollback();
   }
 }
 
@@ -253,6 +253,8 @@ export async function acceptRequest(req: any, res: any) {
     }
   }
 
+  const tr = await  SeqDb.SequelizeDB.getConnection().transaction();
+
   for (let i in list_req) {
     if (!accepted[parseInt(i)]) {
       await UpdateRequest.Request.update(
@@ -264,6 +266,7 @@ export async function acceptRequest(req: any, res: any) {
           where: {
             id_request: id_request[parseInt(i)],
           },
+          transaction : tr
         }
       );
     }
@@ -275,7 +278,8 @@ export async function acceptRequest(req: any, res: any) {
       if (list_user[i].tokens >= list_req[i].req_cost) {
         await tokenUpdate(
           list_user[i].tokens - list_req[i].req_cost,
-          list_user[i].username
+          list_user[i].username,
+          tr
         );
 
         await UpdateRequest.Request.update(
@@ -345,11 +349,15 @@ export async function rechargeTokens(req: any, res: any) {
     return;
   }
 
+  const tr = await SeqDb.SequelizeDB.getConnection().transaction();
+
   try {
-    await tokenUpdate(user.tokens + amount, user.username);
+    await tokenUpdate(user.tokens + amount, user.username, tr);
     res.status(200).send("Ricarica dei token effettuata");
+    await tr.commit();
   } catch (error) {
     res.status(500).send("Errore nella ricarica dei token");
+    await tr.rollback();
   }
 }
 
