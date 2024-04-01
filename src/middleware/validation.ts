@@ -1,22 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import * as Controller from "../controller/controller";
 require("dotenv").config();
-
-/*
-1. Autenticazione con JWT
-2. if AUTH = true, next()
-2.1 Validazione grafo: validazione grafo nel body della richiesta secondo la struttura prevista
-e conteggio nodi e archi per calcolo costo
-2.2 checkUserBalance: verifica del saldo del token dell'utente
-if User.token >= costo, validate richiesta
-*/
-
-// 2.1 Validazione grafo
-// Verifica la presenza del grafo nel body della richiesta
-// Valida la struttura del grafo secondo le specifiche previste
-// Conta il numero di nodi e archi per calcolare il costo
-// Salva le informazioni del grafo e il costo nell'oggetto req per utilizzarli successivamente
-// Chiama next() per passare al middleware successivo
 
 export function validateGraph(
   req: Request,
@@ -160,9 +143,7 @@ export async function validateSimulation(req: any, res: any, next: any) {
   let step: number = options.step;
 
   if (typeof id_graph !== "number" || id_graph <= 0) {
-    res
-      .status(400)
-      .send({ error: "id_graph deve essere un numero positivo." });
+    res.status(400).send({ error: "id_graph deve essere un numero positivo." });
     return;
   }
 
@@ -181,57 +162,39 @@ export async function validateSimulation(req: any, res: any, next: any) {
     return;
   }
 
-  if ((typeof step !== "number" || step <= 0) || step > stop - start) {
-    res.status(400).send({ error: "step deve essere un numero strettamente positivo e minore di stop - start" });
+  if (typeof step !== "number" || step <= 0 || step > stop - start) {
+    res.status(400).send({
+      error:
+        "step deve essere un numero strettamente positivo e minore di stop - start",
+    });
     return;
   }
 
-  if(!route.start){
+  if (!route.start) {
     res.status(400).send("start vuoto/null");
     return;
   }
-  if(!route.goal){
+  if (!route.goal) {
     res.status(400).send("goal vuot/null");
     return;
   }
 
-  if(route.start === route.goal){
+  if (route.start === route.goal) {
     res.status(400).send("nodo di partenza e nodo di arrivo uguali");
     return;
   }
-  /*if (
-    (!route.start || !route.goal) &&
-    typeof route.start !== "string" &&
-    typeof route.goal !== "string"
-  ) {
-    res
-      .status(400)
-      .send({ error: "start e end devono essere una stringa non vuota." });
-    return;
-  }*/
 
-  /*if (typeof edge.node1 !== "string" && typeof edge.node2 !== "string") {
-    res
-      .status(400)
-      .send({ error: "node1 e node2 devono essere una stringa non vuota." });
-    return;
-  }
-
-  if (edge.node1 == edge.node2) {
-    res.status(400).send({ error: "node1 e node2 non possono essere uguali." });
-    return;
-  }*/
-  if(!edge.node1){
+  if (!edge.node1) {
     res.status(400).send("nodo1 vuoto/null");
     return;
   }
 
-  if(!edge.node2){
+  if (!edge.node2) {
     res.status(400).send("nodo2 vuoto/null");
     return;
   }
 
-  if(edge.node1 === edge.node2){
+  if (edge.node1 === edge.node2) {
     res.status(400).send("nodo1 e node2 uguali");
     return;
   }

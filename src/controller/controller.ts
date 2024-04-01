@@ -3,10 +3,11 @@ import { Graph, insertGraph, getGraphById, getGraph } from "../model/graph";
 import * as UpdateRequest from "../model/request";
 import { Request, Response } from "express";
 import * as Utils from "../utils/utils";
+import { sendResponse } from "../utils/messages_sender";
+import HttpStatusCode from "../utils/http_status_code";
+import Message from "../utils/messages_string";
 
 import * as SeqDb from "../singleton/sequelize";
-
-import sequelize from "sequelize";
 
 const GraphD = require("node-dijkstra");
 
@@ -29,21 +30,29 @@ export async function createGraph(req: any, res: Response) {
       timestamp: new Date(),
       id_creator: parseInt(user.id_user),
     };
-    
+
     //lo passo ad entrambe le funzioni
     const t = await SeqDb.SequelizeDB.getConnection().transaction();
 
     try {
-      insertGraph(obj,t); 
-      tokenUpdate(user.tokens - total_cost, user.username, t);
-      res.status(200).send("Grafo creato con successo");
+      await insertGraph(obj, t);
+      await tokenUpdate(user.tokens - total_cost, user.username, t);
+      sendResponse(res, HttpStatusCode.OK, Message.GRAPH_CREATED);
       await t.commit();
     } catch (error) {
       await t.rollback();
-      res.status(500).send("Errore nella creazione del grafo");
+      sendResponse(
+        res,
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        Message.GRAPH_CREATED_ERROR
+      );
     }
   } else {
-    res.status(500).send("Token insufficienti");
+    sendResponse(
+      res,
+      HttpStatusCode.UNAUTHORIZED,
+      Message.insufficientBalance_message
+    );
   }
 }
 
@@ -92,7 +101,6 @@ export async function updateWeight(req: any, res: Response) {
   let costo_richiesta = Object.keys(data).length * 0.025;
 
   if (user.id_user == graph_obj.id_creator) {
-
     //check se ho i tokens e li sottraggo anche
     if (user.tokens < costo_richiesta) {
       res.status(500).send("Token insufficienti");
@@ -101,7 +109,7 @@ export async function updateWeight(req: any, res: Response) {
 
     const tr = await SeqDb.SequelizeDB.getConnection().transaction();
 
-    try{
+    try {
       await Graph.update(
         {
           graph: JSON.stringify(graph),
@@ -111,33 +119,35 @@ export async function updateWeight(req: any, res: Response) {
           where: {
             id_graph: graph_id,
           },
-          transaction : tr
+          transaction: tr,
         }
       );
 
-      await UpdateRequest.Request.create({
-        req_status: "accepted",
-        metadata: data,
-        req_cost: costo_richiesta,
-        timestamp: new Date(),
-        req_users: user.id_user,
-        req_graph: graph_id,
-      },{
-        transaction : tr
-      });
+      await UpdateRequest.Request.create(
+        {
+          req_status: "accepted",
+          metadata: data,
+          req_cost: costo_richiesta,
+          timestamp: new Date(),
+          req_users: user.id_user,
+          req_graph: graph_id,
+        },
+        {
+          transaction: tr,
+        }
+      );
 
       await tokenUpdate(user.tokens - costo_richiesta, user.username, tr);
       res.status(200).send("Richiesta accettata");
       await tr.commit();
-    }catch(error){
+    } catch (error) {
       await tr.rollback();
       res.status(500).send("errore creazione richiesta");
       return;
     }
   } else {
-    
     //check se ha abbastanza token e NON li sottraggo, li sottraggo quando la richiesta verrà accettata
-    try{
+    try {
       UpdateRequest.Request.create({
         req_status: "pending",
         metadata: data,
@@ -146,8 +156,7 @@ export async function updateWeight(req: any, res: Response) {
         req_users: user.id_user,
         req_graph: graph_id,
       });
-    }
-    catch(error){
+    } catch (error) {
       res.status(500).send("errore creazione richiesta");
       return;
     }
@@ -194,13 +203,13 @@ export async function executeModel(req: any, res: any) {
 
     res.status(200).send(result);
 
-    tokenUpdate(user.tokens - graph_obj.costo, user.username, tr);
+    await tokenUpdate(user.tokens - graph_obj.costo, user.username, tr);
     await tr.commit();
   } catch (error: any) {
     res
       .status(500)
       .send("Errore nell'esecuzione del modello: " + error.message);
-      tr.rollback();
+    tr.rollback();
   }
 }
 
@@ -253,7 +262,7 @@ export async function acceptRequest(req: any, res: any) {
     }
   }
 
-  const tr = await  SeqDb.SequelizeDB.getConnection().transaction();
+  const tr = await SeqDb.SequelizeDB.getConnection().transaction();
 
   for (let i in list_req) {
     if (!accepted[parseInt(i)]) {
@@ -266,7 +275,7 @@ export async function acceptRequest(req: any, res: any) {
           where: {
             id_request: id_request[parseInt(i)],
           },
-          transaction : tr
+          transaction: tr,
         }
       );
     }
