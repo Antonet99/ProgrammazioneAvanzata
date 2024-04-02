@@ -28,7 +28,7 @@ CREATE TABLE graph (
     nodes INTEGER,
     edges INTEGER,
     graph_cost REAL,
-    timestamp TIMESTAMP,
+    timestamp TIMESTAMPTZ,
     id_creator INTEGER REFERENCES users(id_user)
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE request (
     req_status request_status,
     metadata JSONB,
     req_cost REAL,
-    timestamp TIMESTAMP,
+    timestamp TIMESTAMPTZ,
     req_users INTEGER REFERENCES users(id_user),
     req_graph INTEGER REFERENCES graph(id_graph)
 );

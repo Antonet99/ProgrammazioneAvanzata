@@ -44,8 +44,9 @@ export const Graph = sequelize.define(
   }
 );
 
-export async function insertGraph(graph: any, tr : Transaction) { // , tr : sequelize.Transaction
-  await Graph.create(graph, {transaction : tr}).catch((error) => {
+export async function insertGraph(graph: any, tr: Transaction) {
+  // , tr : sequelize.Transaction
+  await Graph.create(graph, { transaction: tr }).catch((error) => {
     error;
   });
 }
@@ -59,7 +60,7 @@ export async function getGraphById(id_graph: number) {
   return result;
 }
 
-export async function getGraph() {
+export async function getAllGraph() {
   let result: any;
   result = await Graph.findAll({
     raw: true,

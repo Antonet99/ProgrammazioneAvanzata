@@ -1,6 +1,6 @@
 require("dotenv").config();
 import jwt from "jsonwebtoken";
-import { User, getUser } from "../model/users";
+import { User, getUserByUsername } from "../model/users";
 
 export function checkAuthHeader(req: any, res: any, next: any): void {
   if (req.headers.authorization) next();
@@ -46,18 +46,17 @@ export function checkJSONPayload(req: any, res: any, next: any): void {
   }
 }
 
-export async function checkAdmin(req : any, res : any, next : any) {
-  try{
-    var admin = await getUser(req.username);
+export async function checkAdmin(req: any, res: any, next: any) {
+  try {
+    var admin = await getUserByUsername(req.username);
 
     if (!admin || admin.role != "admin") {
       throw new Error();
-    } 
-    
+    }
+
     req.admin = admin;
     next();
-  } catch(error){
+  } catch (error) {
     res.status(500).send("Utente admin non trovato");
   }
-  
 }

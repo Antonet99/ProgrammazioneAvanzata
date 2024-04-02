@@ -1,46 +1,45 @@
-enum Messages {
-  noAuthHeader_message = "Bad Request - No authorization header",
-  noPayloadHeader_message = "Bad Request - No JSON payload header",
-  missingToken_message = "Bad Request - Missing JWT Token",
-  invalidToken_message = "Forbidden - Invalid JWT Token",
-  malformedPayload_message = "Bad Request - Malformed payload",
+enum MESSAGES {
+  NO_AUTH_HEADER = "Bad Request - Authorization header missing",
+  NO_PAYLOAD_HEADER = "Bad Request - JSON payload header missing",
+  MISSING_TOKEN = "Bad Request - JWT Token missing",
+  INVALID_TOKEN = "Forbidden - JWT Token invalid",
+  MALFORMED_PAYLOAD = "Bad Request - Payload malformed",
 
-  routeNotFound_message = "Not Found - Route not found",
-  unauthorized_message = "ERROR - Unauthorized",
-  badRequest_message = "ERROR - Bad request",
-  insufficientBalance_message = "Unauthorized - Insufficient token balance",
+  ROUTE_NOT_FOUND = "Not Found - Route not found",
+  UNAUTHORIZED = "Error - Unauthorized",
+  BAD_REQUEST = "Error - Bad request",
+  INSUFFICIENT_BALANCE = "Unauthorized - Insufficient token balance",
 
-  // per grafi
-  GRAPH_CREATED = "Grafo creato con successo",
-  GRAPH_CREATED_ERROR = "Unauthorized - Errore nella creazione del grafo",
-  GRAPH_NOT_FOUND = "graph not found",
-  NO_GRAPH_AVAIBLE = "ERROR - No graph avaible",
+  // For graphs
+  GRAPH_CREATED = "Graph successfully created",
+  GRAPH_CREATION_ERROR = "Unauthorized - Error in graph creation",
+  GRAPH_NOT_FOUND = "Graph not found",
+  NO_GRAPH_AVAILABLE = "Error - No graph available",
 
-  //per utenti
-  USER_NOT_FOUND = "user not found",
+  // For users
+  USER_NOT_FOUND = "User not found",
 
-  //per richieste
-  ACCEPTED_REQUEST = "request accepted",
-  ACCEPTED_DENIED_REQUEST = "requests accepted/denied",
-  EDGE_UPDATED = "edge updated",
-  PENDING_REQUEST = "richiesta in attesa di accettazione/rifiuto",
-  REQUEST_CREATE_ERROR = "could not create the request",
-  
-  REQUEST_USER_UNAUTHORIZED_GRAPH = "you are not the creator of the graph",
+  // For requests
+  REQUEST_ACCEPTED = "Request accepted",
+  REQUESTS_ACCEPTED_DENIED = "Requests accepted/denied",
+  EDGE_UPDATED = "Edge updated",
+  PENDING_REQUEST = "Request pending for acceptance/denial",
+  REQUEST_CREATION_ERROR = "Error - Could not create the request",
 
+  REQUEST_USER_UNAUTHORIZED_GRAPH = "Unauthorized - You are not the creator of the graph",
 
-  //da dividere forse
-  USER_GRAPH_NOT_FOUND = "user or graph not found",
+  // To be divided maybe
+  USER_GRAPH_NOT_FOUND = "User or graph not found",
 
-  MODEL_EXECUTION_ERROR = "Error during the execution of the model",
+  MODEL_EXECUTION_ERROR = "Error - Error during the execution of the model",
 
-  ADMIN_NOT_FOUND = "admin not found",
-  //per admin
-  INVALID_IMPORT = "invalid import, it must be > 0",
-  TOKENS_RECHARGED = "tokens recharged successfully",
-  RECHARGE_FAIL = "could not recharge token",
+  ADMIN_NOT_FOUND = "Admin not found",
+  // For admin
+  INVALID_IMPORT = "Invalid import, it must be > 0",
+  TOKENS_RECHARGED = "Tokens successfully recharged",
+  RECHARGE_FAIL = "Error - Could not recharge tokens",
 
-  DEFAULT_ERROR = ""
+  DEFAULT_ERROR = "",
 }
 
-export default Messages;
+export default MESSAGES;

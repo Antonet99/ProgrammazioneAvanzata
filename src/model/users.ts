@@ -40,7 +40,7 @@ export const User = sequelize.define(
   }
 );
 
-export async function getUser(username: string) {
+export async function getUserByUsername(username: string) {
   let user: any;
   user = await User.findOne({
     raw: true,
@@ -65,19 +65,24 @@ export async function checkExistingUser(username: string) {
   return user;
 }
 
-export async function tokenUpdate(newToken: Number, username: string, tr : Transaction) { //, tr : sequelize.Transaction
+export async function tokenUpdate(
+  newToken: Number,
+  username: string,
+  tr: Transaction
+) {
+  //, tr : sequelize.Transaction
   const user = await User.update(
     {
       tokens: newToken,
     },
     {
       where: { username: `${username}` },
-      transaction : tr
+      transaction: tr,
     }
   );
 }
 
-export async function getRole(username: string) {
+export async function getUserRole(username: string) {
   const role = await User.findOne({
     attributes: ["role"],
     where: { username: username },

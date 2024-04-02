@@ -13,8 +13,8 @@ router.post(
   }
 );
 
-router.get("/getGraph", async function (req: any, res: any) {
-  Controller.getGraphs(req, res);
+router.get("/getAllGraph", async function (req: any, res: any) {
+  Controller.getAllGraphs(req, res);
 });
 
 router.post(
