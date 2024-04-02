@@ -14,7 +14,8 @@ export const Request = sequelize.define(
       primaryKey: true,
     },
     req_status: {
-      type: DataTypes.TEXT,
+      type: DataTypes.ENUM,
+      values: ["pending", "accepted", "denied"],
       allowNull: false,
     },
     metadata: {
@@ -109,4 +110,16 @@ export async function getGraphRequests(
     });
   }
   return result;
+}
+
+export async function createPendingRequest() {
+  let request = await Request.create({
+    req_status: "pending",
+    metadata: {},
+    req_cost: 0,
+    timestamp: new Date(),
+    req_users: 0,
+    req_graph: 0,
+  });
+  return request;
 }

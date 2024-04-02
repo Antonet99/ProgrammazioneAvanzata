@@ -1,5 +1,4 @@
-require("dotenv").config();
-
+//require("dotenv").config();
 import express from "express";
 import { SequelizeDB } from "./singleton/sequelize";
 import { checkAlpha } from "./utils/utils";

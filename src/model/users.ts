@@ -1,6 +1,9 @@
 import { raw } from "express";
 import { SequelizeDB } from "../singleton/sequelize";
 import { Sequelize, DataTypes, where, Transaction } from "sequelize";
+import { sendResponse } from "../utils/messages_sender";
+import HttpStatusCode from "../utils/http_status_code";
+import Message from "../utils/messages_string";
 
 const sequelize = SequelizeDB.getConnection();
 
@@ -82,10 +85,11 @@ export async function tokenUpdate(
   );
 }
 
-export async function getUserRole(username: string) {
-  const role = await User.findOne({
-    attributes: ["role"],
-    where: { username: username },
-  });
-  return role;
+export async function validateUser(username: string, res: Response) {
+  const user = await getUserByUsername(username);
+  if (!user) {
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_NOT_FOUND);
+    return null;
+  }
+  return user;
 }

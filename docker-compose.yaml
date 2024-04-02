@@ -9,20 +9,23 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
-    ports:
-      - "5432:5432"
+      TZ: ${TZ}
     volumes:
-      - db_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/seed.sql
-
-  backend:
-    build: .
+      - ./scripts/seed.sql:/docker-entrypoint-initdb.d/init.sql
+  app:
+    image: tsapp
     ports:
       - "3000:3000"
-    env_file:
-      - .env
     depends_on:
       - db
-
-volumes:
-  db_data:
+    env_file:
+      - .env
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: db
+      DB_PORT: ${DB_PORT}
+      API_PORT: ${API_PORT}
+      JWT_KEY: ${JWT_KEY}
+      ALPHA: ${ALPHA}

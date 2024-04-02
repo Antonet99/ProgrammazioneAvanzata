@@ -27,10 +27,10 @@ router.post(
 );
 
 router.post(
-  "/getPendingRequests",
+  "/graphPendingRequests",
   Middleware.AUTH,
   async function (req: any, res: any) {
-    Controller.getPendingRequests(req, res);
+    Controller.getGraphPendingRequests(req, res);
   }
 );
 
@@ -46,7 +46,7 @@ router.post("/acceptRequest", Middleware.AUTH, function (req: any, res: any) {
   Controller.acceptRequest(req, res);
 });
 
-router.post("/recharge", Middleware.AUTH, function (req: any, res: any) {
+router.post("/rechargeTokens", Middleware.AUTH, function (req: any, res: any) {
   Controller.rechargeTokens(req, res);
 });
 

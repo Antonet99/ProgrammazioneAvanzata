@@ -1,6 +1,9 @@
 import { SequelizeDB } from "../singleton/sequelize";
 import { Sequelize, DataTypes, Transaction } from "sequelize";
 import { User } from "./users";
+import { sendResponse } from "../utils/messages_sender";
+import HttpStatusCode from "../utils/http_status_code";
+import Message from "../utils/messages_string";
 //import sequelize from "sequelize";
 
 const sequelize = SequelizeDB.getConnection();
@@ -67,4 +70,13 @@ export async function getAllGraph() {
     attributes: ["id_graph", "nodes", "edges", "graph_cost", "id_creator"],
   });
   return result;
+}
+
+export async function validateGraphId(requests_b: any, res: Response) {
+  const graph_id = requests_b["graph_id"];
+  if (!graph_id) {
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.GRAPH_NOT_FOUND);
+    return null;
+  }
+  return graph_id;
 }
