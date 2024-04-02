@@ -149,6 +149,12 @@ export async function updateWeight(req: any, res: any) {
     const tr = await SeqDb.SequelizeDB.getConnection().transaction();
 
     try {
+
+      let start = data.start;
+      let end = data.end;
+      let weight = data.weight;
+      graph[start][end] = Utils.exp_avg(graph[start][end], weight);
+      
       await Graph.update(
         {
           graph: JSON.stringify(graph),

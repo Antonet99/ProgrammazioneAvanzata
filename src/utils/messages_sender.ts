@@ -17,5 +17,8 @@ export function sendResponse(
     res.status(status).json(obj);
   }
 
+  if(!message && !obj){
+    res.status(status).send();
+  }
   
 }
