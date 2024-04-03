@@ -15,10 +15,8 @@ import {
 import GraphBuilder from "../builders/graphBuilder";
 
 import * as UpdateRequest from "../model/request";
-//import UpdateRequestBuilder from "../builders/requestBuilder"; // Assicurati che il percorso sia corretto
 
 import { Response } from "express";
-
 import * as Utils from "../utils/utils";
 import { sendResponse } from "../utils/messages_sender";
 import HttpStatusCode from "../utils/http_status_code";
@@ -268,13 +266,22 @@ export async function executeModel(req: any, res: any) {
   }
 }
 
-export async function acceptRequest(req: any, res: any) {
+/*   const listaValori = [valore1, valore2, valore3]; // Aggiungi qui i tuoi valori
+  // Eseguire la query
+  const risultati = await Model.findAll({
+    where: {
+      tuoCampo: {
+        [Op.in]: listaValori
+      }
+    }
+  }); */
+
+export async function acceptDenyRequest(req: any, res: any) {
   let id_request: number[] = req.body.id_request;
   let accepted: boolean[] = req.body.accepted;
 
   if (id_request.length != accepted.length) {
     sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
-    //res.status(500).send("Errore nei parametri");
     return;
   }
 
@@ -284,41 +291,37 @@ export async function acceptRequest(req: any, res: any) {
   let list_req: any[] = [];
   let list_user: any[] = [];
 
-  for (let i in id_request) {
-    await UpdateRequest.Request.findOne({
-      raw: true,
-      where: {
-        id_request: id_request[i],
-        req_status: "pending",
-      },
-    }).then(async (result: any) => {
-      list_req.push(result);
-      list_user.push(await getUserById(result.req_users));
-    });
+  try {
+    let find = await UpdateRequest.findRequestByList(
+      id_request,
+      list_req,
+      list_user
+    );
+    if (!find) {
+      sendResponse(res, HttpStatusCode.NOT_FOUND, Message.REQUEST_NOT_FOUND);
+      return;
+    }
+  } catch (error) {
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    return;
   }
 
   let graph_req: any[] = [];
-  for (let i in list_req) {
-    await Graph.findOne({
-      raw: true,
-      where: {
-        id_graph: list_req[i].req_graph,
-      },
-    }).then((result) => {
-      graph_req.push(result);
-    });
+  try {
+    await UpdateRequest.checkGraphRequest(graph_req, list_req);
+  } catch (error) {
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    return;
   }
 
   for (let i in graph_req) {
     let id_creator = graph_req[i].id_creator;
-    //console.log(typeof id_creator, typeof id_user);
     if (id_user != id_creator) {
-      //res.status(500).send("Non sei il creatore del grafo");
       sendResponse(
         res,
         HttpStatusCode.UNAUTHORIZED,
         Message.REQUEST_USER_UNAUTHORIZED_GRAPH,
-        { unathorized_graph_id: graph_req[i].id_graph }
+        { unauthorized_graph_id: graph_req[i].id_graph }
       );
       return;
     }
@@ -326,78 +329,27 @@ export async function acceptRequest(req: any, res: any) {
 
   const tr = await SeqDb.SequelizeDB.getConnection().transaction();
 
-  for (let i in list_req) {
-    if (!accepted[parseInt(i)]) {
-      await UpdateRequest.Request.update(
-        {
-          req_status: "denied",
-        },
-        {
-          returning: false,
-          where: {
-            id_request: id_request[parseInt(i)],
-          },
-          transaction: tr,
-        }
-      );
-    }
-  }
-
-  for (let i in list_req) {
-    console.log(list_user[i].tokens, list_req[i].req_cost);
-    if (accepted[parseInt(i)]) {
-      if (list_user[i].tokens >= list_req[i].req_cost) {
-        await tokenUpdate(
-          list_user[i].tokens - list_req[i].req_cost,
-          list_user[i].username,
-          tr
-        );
-
-        await UpdateRequest.Request.update(
-          {
-            req_status: "accepted",
-          },
-          {
-            returning: false,
-            where: {
-              id_request: list_req[i].id_request,
-            },
-          }
-        );
-
-        for (let j in list_req[i].metadata) {
-          let start = list_req[i].metadata[j].start;
-          let end = list_req[i].metadata[j].end;
-          let weight = list_req[i].metadata[j].weight;
-          var graph = JSON.parse(graph_req[i].graph);
-          graph[start][end] = Utils.exp_avg(graph[start][end], weight);
-        }
-        //qui try catch in caso non esiste l'arco sul grafo
-
-        await Graph.update(
-          {
-            graph: JSON.stringify(graph),
-          },
-          {
-            returning: false,
-            where: {
-              id_graph: list_req[i].req_graph,
-            },
-          }
-        );
+  try {
+    for (let i in list_req) {
+      if (!accepted[parseInt(i)]) {
+        await UpdateRequest.denyRequest(list_req[i].id_request, tr);
       } else {
-        //res.status(500).send(`L'utente ${list_user[i].username} ha token insufficienti`);
-        sendResponse(
-          res,
-          HttpStatusCode.UNAUTHORIZED,
-          Message.INSUFFICIENT_BALANCE,
-          { username: list_user[i].username }
+        await UpdateRequest.acceptRequest(
+          list_user[i],
+          list_req[i],
+          graph_req[i],
+          tr,
+          res
         );
-        return;
       }
     }
+    await tr.commit();
+  } catch (error) {
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    await tr.rollback();
+    return;
   }
-  //res.status(200).send("Richieste accettate/rifiutate");
+
   sendResponse(res, HttpStatusCode.OK, Message.REQUESTS_ACCEPTED_DENIED);
 }
 

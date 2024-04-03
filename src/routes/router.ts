@@ -42,9 +42,13 @@ router.post(
   }
 );
 
-router.post("/acceptRequest", Middleware.AUTH, function (req: any, res: any) {
-  Controller.acceptRequest(req, res);
-});
+router.post(
+  "/acceptDenyRequest",
+  Middleware.AUTH,
+  function (req: any, res: any) {
+    Controller.acceptDenyRequest(req, res);
+  }
+);
 
 router.post("/rechargeTokens", Middleware.AUTH, function (req: any, res: any) {
   Controller.rechargeTokens(req, res);

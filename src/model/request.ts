@@ -1,7 +1,11 @@
 import { SequelizeDB } from "../singleton/sequelize";
-import { Sequelize, DataTypes } from "sequelize";
+import { Sequelize, DataTypes, Transaction } from "sequelize";
 import { Graph } from "./graph";
-import { User } from "./users";
+import { User, getUserById, tokenUpdate } from "./users";
+import { sendResponse } from "../utils/messages_sender";
+import HttpStatusCode from "../utils/http_status_code";
+import Message from "../utils/messages_string";
+import { exp_avg } from "../utils/utils";
 
 const sequelize = SequelizeDB.getConnection();
 
@@ -112,14 +116,105 @@ export async function getGraphRequests(
   return result;
 }
 
-export async function createPendingRequest() {
-  let request = await Request.create({
-    req_status: "pending",
-    metadata: {},
-    req_cost: 0,
-    timestamp: new Date(),
-    req_users: 0,
-    req_graph: 0,
-  });
-  return request;
+export async function findRequestByList(
+  id_request: number[],
+  list_req: any[],
+  list_user: any[]
+): Promise<boolean> {
+  for (let i of id_request) {
+    let result: any = await Request.findOne({
+      raw: true,
+      where: {
+        id_request: i,
+        req_status: "pending",
+      },
+    });
+    if (result == null) {
+      return false;
+    }
+    list_req.push(result);
+    list_user.push(await getUserById(result.req_users));
+  }
+  return true;
+}
+
+export async function checkGraphRequest(graph_req: any[], list_req: any[]) {
+  for (let i in list_req) {
+    await Graph.findOne({
+      raw: true,
+      where: {
+        id_graph: list_req[i].req_graph,
+      },
+    }).then((result) => {
+      graph_req.push(result);
+    });
+  }
+}
+
+export async function denyRequest(id_request: number, tr: Transaction) {
+  await Request.update(
+    {
+      req_status: "denied",
+    },
+    {
+      returning: false,
+      where: {
+        id_request: id_request,
+      },
+      transaction: tr,
+    }
+  );
+}
+
+export async function acceptRequest(
+  user: any,
+  request: any,
+  graph_req: any,
+  tr: Transaction,
+  res: any
+) {
+  if (user.tokens >= request.req_cost) {
+    await tokenUpdate(user.tokens - request.req_cost, user.username, tr);
+    await Request.update(
+      {
+        req_status: "accepted",
+      },
+      {
+        returning: false,
+        where: {
+          id_request: request.id_request,
+        },
+        transaction: tr,
+      }
+    );
+    for (let j in request.metadata) {
+      let start = request.metadata[j].start;
+      let end = request.metadata[j].end;
+      let weight = request.metadata[j].weight;
+      let graph = JSON.parse(graph_req.graph);
+
+      graph[start][end] = exp_avg(graph[start][end], weight);
+
+      await Graph.update(
+        {
+          graph: JSON.stringify(graph),
+        },
+        {
+          returning: false,
+          where: {
+            id_graph: request.req_graph,
+          },
+          transaction: tr,
+        }
+      );
+    }
+  } else {
+    sendResponse(
+      res,
+      HttpStatusCode.UNAUTHORIZED,
+      Message.INSUFFICIENT_BALANCE,
+      { username: user.username }
+    );
+    return;
+  }
 }

@@ -6,29 +6,29 @@ CREATE TYPE user_role AS ENUM ('admin', 'user');
 CREATE TYPE request_status AS ENUM ('pending', 'accepted', 'rejected');
 
 CREATE TABLE users (
-    id_user SERIAL PRIMARY KEY,
-    username TEXT UNIQUE,
-    email TEXT UNIQUE,
-    role user_role DEFAULT 'user',
-    tokens REAL DEFAULT 10
+    id_user SERIAL PRIMARY KEY NOT NULL,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    role user_role DEFAULT 'user' NOT NULL,
+    tokens REAL DEFAULT 10 NOT NULL
 );
 CREATE TABLE graph (
-    id_graph SERIAL PRIMARY KEY,
-    graph JSONB, 
-    nodes INTEGER,
-    edges INTEGER,
-    graph_cost REAL,
-    timestamp TIMESTAMPTZ,
-    id_creator INTEGER REFERENCES users(id_user)
+    id_graph SERIAL PRIMARY KEY NOT NULL,
+    graph JSONB NOT NULL, 
+    nodes INTEGER NOT NULL,
+    edges INTEGER NOT NULL,
+    graph_cost REAL NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL,
+    id_creator INTEGER REFERENCES users(id_user) NOT NULL
 );
 CREATE TABLE request (
-    id_request SERIAL PRIMARY KEY,
-    req_status request_status,
-    metadata JSONB,
-    req_cost REAL,
-    timestamp TIMESTAMPTZ,
-    req_users INTEGER REFERENCES users(id_user),
-    req_graph INTEGER REFERENCES graph(id_graph)
+    id_request SERIAL PRIMARY KEY NOT NULL,
+    req_status request_status NOT NULL,
+    metadata JSONB NOT NULL,
+    req_cost REAL NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL,
+    req_users INTEGER REFERENCES users(id_user) NOT NULL,
+    req_graph INTEGER REFERENCES graph(id_graph) NOT NULL
 );
 
 INSERT INTO users (username, email, role) VALUES

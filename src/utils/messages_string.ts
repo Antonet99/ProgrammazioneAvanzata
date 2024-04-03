@@ -26,6 +26,7 @@ enum MESSAGES {
   PENDING_REQUEST = "Request pending for acceptance/denial",
   REQUEST_CREATION_ERROR = "Error - Could not create the request",
   REQUEST_USER_UNAUTHORIZED_GRAPH = "Unauthorized - You are not the creator of the graph",
+  REQUEST_NOT_FOUND = "Request not found or already accepted/denied",
 
   // To be divided maybe
   USER_GRAPH_NOT_FOUND = "User or graph not found",
