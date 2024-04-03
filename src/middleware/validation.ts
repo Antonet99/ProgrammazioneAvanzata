@@ -1,4 +1,7 @@
 import { Request, Response, NextFunction } from "express";
+import { sendResponse } from "../utils/messages_sender";
+import HttpStatusCode from "../utils/http_status_code";
+import Message from "../utils/messages_string";
 require("dotenv").config();
 
 export function validateGraph(
@@ -8,7 +11,8 @@ export function validateGraph(
 ): void {
   const graph = req.body;
   if (Object.keys(graph).length == 0) {
-    res.status(400).json({ error: "Grafo mancante nella richiesta" });
+    //res.status(400).json({ error: "Grafo mancante nella richiesta" });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MISSING_BODY);
     return;
   }
 
@@ -17,7 +21,8 @@ export function validateGraph(
     typeof graph !== "object" || // verifica che graph sia un oggetto
     Object.values(graph).some((node) => typeof node !== "object") // verifica che ogni valore in graph sia un oggetto
   ) {
-    res.status(400).json({ error: "Struttura del grafo non valida" });
+    //res.status(400).json({ error: "Struttura del grafo non valida" });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 
@@ -30,9 +35,8 @@ export function validateGraph(
         graph[node][edge] < 0 ||
         node == edge
       ) {
-        res
-          .status(400)
-          .json({ error: `Peso dell'arco ${graph[node][edge]} non valido` });
+        //res.status(400).json({ error: `Peso dell'arco ${graph[node][edge]} non valido` });
+        sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.BAD_REQUEST, {invalid_edge : graph[node][edge]} );
         return;
       }
     }
@@ -49,7 +53,8 @@ export async function validateUpdateRequest(
   const requests = req.body;
 
   if (Object.keys(requests).length == 0) {
-    res.status(400).json({ error: "Richiesta mancante nel body" });
+    //res.status(400).json({ error: "Richiesta mancante nel body" });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MISSING_BODY);
     return;
   }
 
@@ -57,7 +62,8 @@ export async function validateUpdateRequest(
   if (
     typeof requests !== "object" // verifica che requests sia un oggetto
   ) {
-    res.status(400).json({ error: "Struttura della richiesta non valida" });
+    //res.status(400).json({ error: "Struttura della richiesta non valida" });
+    sendResponse(res,HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD)
     return;
   }
 
@@ -70,7 +76,8 @@ export async function validateUpdateRequest(
         requests.weight < 0
     )
   ) {
-    res.status(400).json({ error: "Struttura della richiesta non valida" });
+    //res.status(400).json({ error: "Struttura della richiesta non valida" });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 

@@ -4,6 +4,7 @@ enum MESSAGES {
   MISSING_TOKEN = "Bad Request - JWT Token missing",
   INVALID_TOKEN = "Forbidden - JWT Token invalid",
   MALFORMED_PAYLOAD = "Bad Request - Payload malformed",
+  MISSING_BODY = "Empty request body",
 
   ROUTE_NOT_FOUND = "Not Found - Route not found",
   UNAUTHORIZED = "Error - Unauthorized",
