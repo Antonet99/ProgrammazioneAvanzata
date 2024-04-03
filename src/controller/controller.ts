@@ -45,7 +45,7 @@ export async function createGraph(req: any, res: Response) {
       .setEdges(edges)
       .setGraphCost(total_cost)
       .setTimestamp()
-      .setIdCreator(user) //CONTROLLARE
+      .setIdCreator(user)
       .build();
 
     const t = await SeqDb.SequelizeDB.getConnection().transaction();
@@ -149,12 +149,11 @@ export async function updateWeight(req: any, res: any) {
     const tr = await SeqDb.SequelizeDB.getConnection().transaction();
 
     try {
-
       let start = data.start;
       let end = data.end;
       let weight = data.weight;
       graph[start][end] = Utils.exp_avg(graph[start][end], weight);
-      
+
       await Graph.update(
         {
           graph: JSON.stringify(graph),

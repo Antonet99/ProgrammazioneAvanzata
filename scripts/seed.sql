@@ -35,3 +35,5 @@ INSERT INTO users (username, email, role) VALUES
 ('user1', 'user1@email.com', 'user'),
 ('user2', 'user2@email.com', 'user'),
 ('admin1', 'admin1@email.com', 'admin');;
+
+SET timezone = 'Europe/Rome';
