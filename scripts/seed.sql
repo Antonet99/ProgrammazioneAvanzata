@@ -37,3 +37,4 @@ INSERT INTO users (username, email, role) VALUES
 ('admin1', 'admin1@email.com', 'admin');;
 
 SET timezone = 'Europe/Rome';
+

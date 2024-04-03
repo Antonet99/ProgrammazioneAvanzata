@@ -101,38 +101,6 @@ export async function updateWeight(req: any, res: any) {
   let data = requests_b["data"];
   let costo_richiesta = Object.keys(data).length * 0.025;
 
-  /* const requests_b = req.body;
-  const username = req.username;
-
-  try {
-    var user = await getUserByUsername(username);
-    if (!user) {
-      throw new Error("Username non trovato");
-    }
-  } catch (error: any) {
-    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_NOT_FOUND);
-    return;
-  }
-
-  try {
-    var graph_id = requests_b["graph_id"];
-    if (!graph_id) {
-      throw new Error("Graph id non trovato");
-    }
-  } catch (error: any) {
-    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.GRAPH_NOT_FOUND);
-    return;
-  }
-
-  const graph_obj: any = await getGraphById(graph_id).catch((error) => {
-    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
-    return;
-  });
-
-  const graph = JSON.parse(graph_obj.graph);
-  let data = requests_b["data"];
-  let costo_richiesta = Object.keys(data).length * 0.025; */
-
   if (user.id_user == graph_obj.id_creator) {
     //check se ho i tokens e li sottraggo anche
     if (user.tokens < costo_richiesta) {
@@ -223,10 +191,10 @@ export async function executeModel(req: any, res: any) {
 
   try {
     var user = await getUserByUsername(req.username);
-
     var graph_obj = await getGraphById(id_graph);
   } catch (error) {
     sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_GRAPH_NOT_FOUND);
+    return;
   }
 
   let graph = JSON.parse(graph_obj.graph);
@@ -247,7 +215,7 @@ export async function executeModel(req: any, res: any) {
     let result = {
       Percorso: path,
       Costo: cost,
-      "Tempo di esecuzione": parseFloat(executionTime.toFixed(4)),
+      "Tempo di esecuzione (ms)": parseFloat(executionTime.toFixed(4)),
     };
 
     sendResponse(res, HttpStatusCode.OK, undefined, result);

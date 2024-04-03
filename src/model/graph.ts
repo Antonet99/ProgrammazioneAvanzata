@@ -60,6 +60,9 @@ export async function getGraphById(id_graph: number) {
     raw: true,
     where: { id_graph: id_graph },
   });
+  if (!result) {
+    throw new Error();
+  }
   return result;
 }
 
@@ -67,7 +70,14 @@ export async function getAllGraph() {
   let result: any;
   result = await Graph.findAll({
     raw: true,
-    attributes: ["id_graph", "nodes", "edges", "graph_cost", "id_creator"],
+    attributes: [
+      "id_graph",
+      "nodes",
+      "edges",
+      "graph_cost",
+      "id_creator",
+      "graph",
+    ],
   });
   return result;
 }

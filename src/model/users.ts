@@ -49,6 +49,9 @@ export async function getUserByUsername(username: string) {
     raw: true,
     where: { username: username },
   });
+  if (!user) {
+    throw new Error();
+  }
   return user;
 }
 
