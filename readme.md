@@ -40,7 +40,8 @@ Il pattern Chain of Responsibility (CoR), appartenente ai Behavioural Design Pat
 - middleware per la verifica dell’header e del token JWT, se necessario;
 - middleware specifici per la rotta, per il controllo di tipi, integrità dei dati e vincoli del database;
 - middleware per la validazione dei vari payload e per il trattamento degli errori, che intervengono in caso di eccezioni negli anelli precedenti.
-  La CoR è implementata nella cartella _middleware_.
+
+La CoR è implementata nella cartella _middleware_.
 
 ### **Builder**
 
