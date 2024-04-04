@@ -46,8 +46,6 @@ Il pattern Chain of Responsibility (CoR), appartenente ai Behavioural Design Pat
 
 Il pattern Builder separa la costruzione di un oggetto complesso dalla sua rappresentazione, consentendo lo stesso processo di costruzione per creare diverse rappresentazioni. Nel caso specifico, il Builder è stato utilizzato per la costruzione dei grafi, elementi che nel nostro programma hanno diversi attributi: questa soluzione fornisce un’interfaccia per la costruzione dell’oggetto passo dopo passo, e può permettere di costruire l’oggetto in diverse varianti, senza che il codice cliente sia influenzato dai cambiamenti nella costruzione dell’oggetto stesso.
 
-## Avvio del Progetto
-
 ## Avvio del servizio
 
 Prerequisiti:
