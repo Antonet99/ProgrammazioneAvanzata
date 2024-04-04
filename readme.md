@@ -40,12 +40,13 @@ Il pattern Chain of Responsibility (CoR), appartenente ai Behavioural Design Pat
 - middleware per la verifica dell’header e del token JWT, se necessario;
 - middleware specifici per la rotta, per il controllo di tipi, integrità dei dati e vincoli del database;
 - middleware per la validazione dei vari payload e per il trattamento degli errori, che intervengono in caso di eccezioni negli anelli precedenti.
-
-La CoR è implementata nella cartella _middleware_.
+  La CoR è implementata nella cartella _middleware_.
 
 ### **Builder**
 
 Il pattern Builder separa la costruzione di un oggetto complesso dalla sua rappresentazione, consentendo lo stesso processo di costruzione per creare diverse rappresentazioni. Nel caso specifico, il Builder è stato utilizzato per la costruzione dei grafi, elementi che nel nostro programma hanno diversi attributi: questa soluzione fornisce un’interfaccia per la costruzione dell’oggetto passo dopo passo, e può permettere di costruire l’oggetto in diverse varianti, senza che il codice cliente sia influenzato dai cambiamenti nella costruzione dell’oggetto stesso.
+
+## Avvio del Progetto
 
 ## Avvio del servizio
 
@@ -56,10 +57,10 @@ Prerequisiti:
 Procedura di avvio:
 
 - Posizionarsi nella cartella clonata dal seguente repository
-- Eseguire il seguente comando: (sostituire 'mysupersecretkey' con la chiave con la quale verranno generati i token JWT)
+- Eseguire il seguente comando: (sostituire 'mysecretkey' con la chiave con la quale verranno generati i token JWT)
 
 ```
-$ echo 'KEY=mysupersecretkey' >> .env
+$ echo 'KEY=mysecretkey' >> .env
 ```
 
 - Avviare il servizio Docker tramite il comando:
@@ -75,7 +76,7 @@ $ docker-compose up
 | TIPO | ROTTA                 | JWT |
 | ---- | --------------------- | --- |
 | POST | /createGraph          | Sì  |
-| PUT  | /updateEdge           | Sì  |
+| POST | /updateEdge           | Sì  |
 | POST | /acceptRequest        | Sì  |
 | POST | /executeModel         | Sì  |
 | POST | /rechargeTokens       | Sì  |
@@ -84,7 +85,7 @@ $ docker-compose up
 | POST | /executeModel         | Sì  |
 | GET  | /getAllGraph          | No  |
 
-### Creazione di un nuovo modello
+### - Creazione di un nuovo modello
 
 **Rotta:** `POST /createGraph`
 
@@ -105,9 +106,9 @@ Esempio di **payload:**
 }
 ```
 
-### Aggiornamento dei pesi degli archi di un modello
+### - Aggiornamento dei pesi degli archi di un modello
 
-**Rotta:** `PUT /updateEdge`
+**Rotta:** `POST /updateEdge`
 
 **Parametri query:**
 
@@ -126,7 +127,7 @@ Esempio di **payload:**
 }
 ```
 
-### Approvazione o rifiuto delle richieste di aggiornamento
+### - Approvazione o rifiuto delle richieste di aggiornamento
 
 **Rotta:** `POST /acceptRequest`
 
@@ -144,7 +145,7 @@ Esempio di **payload:**
 }
 ```
 
-### Esecuzione dell'algoritmo di Dijkstra su un grafo
+### - Esecuzione dell'algoritmo di Dijkstra su un grafo
 
 **Rotta:** `POST /executeModel`
 
@@ -164,7 +165,7 @@ Esempio di **payload:**
 }
 ```
 
-### Ricarica dei token di un utente
+### - Ricarica dei token di un utente
 
 La seguente rotta è disponibile solo per gli utenti di tipo **admin**
 
@@ -184,7 +185,7 @@ Esempio di **payload:**
 }
 ```
 
-### Recupero dello storico degli aggiornamenti di un modello
+### - Recupero dello storico degli aggiornamenti di un modello
 
 **Rotta:** `POST /getGraphRequests`
 
@@ -204,7 +205,7 @@ Esempio di **payload:**
 }
 ```
 
-### Recupero delle richieste di aggiornamento in sospeso per un grafo
+### - Recupero delle richieste di aggiornamento in sospeso per un grafo
 
 **Rotta:** `POST /graphPendingRequests`
 
@@ -220,7 +221,7 @@ Esempio di **payload:**
 }
 ```
 
-### Simulazione di variazione del peso di un arco
+### - Simulazione di variazione del peso di un arco
 
 **Rotta:** `POST /simulateModel`
 
@@ -236,23 +237,23 @@ Esempio di **payload:**
 ```json
 {
   "id_graph": 1,
-  "options":  {
-	    "start": 1,
-	    "stop": 2,
-	    "step": 0.1
-	    }
-  "route":  {
-	    "start": "A",
-	    "goal": "D"
-	    }
-	"edge":  {
-		"node1": "A",
-		"node2": "B",
-		}
+  "options": {
+    "start": 1,
+    "stop": 2,
+    "step": 0.1
+  },
+  "route": {
+    "start": "A",
+    "goal": "D"
+  },
+  "edge": {
+    "node1": "A",
+    "node2": "B"
+  }
 }
 ```
 
-### Recupero di tutti i grafi dal database
+### - Recupero di tutti i grafi dal database
 
 **Rotta:** `GET /getAllGraph`
 
@@ -276,5 +277,5 @@ Si può procedere con l’esecuzione di una serie di test già configurati impor
 
 ### Autori
 
-- Antonio Baio: [Github](https://github.com/Antonet99)
-- Christian Parente: [Github](https://github.com/Parents99)
+- Antonio Baio: [Github](https://github.com/giordanoangelini)
+- Christian Parente: [Github](https://github.com/DiSilvestreCristian)
