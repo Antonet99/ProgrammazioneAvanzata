@@ -46,6 +46,7 @@ router.post(
 router.post(
   "/acceptDenyRequest",
   Middleware.AUTH,
+  Middleware.REQ,
   function (req: any, res: any) {
     Controller.acceptDenyRequest(req, res);
   }
@@ -64,7 +65,7 @@ router.post(
   "/getGraphRequests",
   Middleware.AUTH,
   Middleware.DATE,
-  Middleware.REQ,
+  Middleware.REQSTAT,
   async function (req: any, res: any) {
     Controller.getGraphRequest(req, res);
   }
@@ -74,6 +75,7 @@ router.post(
   "/simulateModel",
   Middleware.AUTH,
   Middleware.SIM,
+  Middleware.GRAPH_ID,
   async function (req: any, res: any) {
     Controller.simulateModel(req, res);
   }

@@ -96,7 +96,6 @@ export async function updateWeight(req: any, res: any) {
 
   let graph = JSON.parse(graph_obj.graph);
   let data = requests_b["data"];
-  console.log(data);
   let costo_richiesta = Object.keys(data).length * 0.025;
 
   if (user.id_user == graph_obj.id_creator) {
@@ -132,7 +131,6 @@ export async function updateWeight(req: any, res: any) {
           transaction: tr,
         }
       );
-      console.log("graph updated");
 
       await UpdateRequest.Request.create(
         {
@@ -253,11 +251,6 @@ export async function acceptDenyRequest(req: any, res: any) {
   let id_request: number[] = req.body.id_request;
   let accepted: boolean[] = req.body.accepted;
 
-  if (id_request.length != accepted.length) {
-    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
-    return;
-  }
-
   let user = await getUserByUsername(req.username);
   let id_user = user.id_user;
 
@@ -304,6 +297,7 @@ export async function acceptDenyRequest(req: any, res: any) {
 
   try {
     for (let i in list_req) {
+      //console.log(list_req[i].metadata);
       if (!accepted[parseInt(i)]) {
         await UpdateRequest.denyRequest(list_req[i].id_request, tr);
       } else {
@@ -318,6 +312,7 @@ export async function acceptDenyRequest(req: any, res: any) {
     }
     await tr.commit();
   } catch (error) {
+    console.log(error);
     sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
     await tr.rollback();
     return;
@@ -386,7 +381,13 @@ export async function simulateModel(req: any, res: any) {
   let route = req.body.route;
   let edge = req.body.edge;
 
-  let graph_obj = await getGraphById(id_graph);
+  try {
+    var graph_obj = await getGraphById(id_graph);
+  } catch (error) {
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.GRAPH_NOT_FOUND);
+    return;
+  }
+
   let graph = JSON.parse(graph_obj.graph);
 
   let start: number = options.start;

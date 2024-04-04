@@ -6,6 +6,7 @@ export const AUTH = [
   authorization.checkPayloadHeader,
   authorization.checkToken,
   authorization.verifyAndAuthenticate,
+  authorization.checkUser,
 ];
 
 export const GRAPH = [validation.validateGraph];
@@ -14,7 +15,8 @@ export const GRAPH_ID = [validation.validateGraphId];
 export const UPDATE = [validation.validateUpdateRequest];
 
 export const DATE = [validation.validateDate];
-export const REQ = [validation.validateReqStatus];
+export const REQSTAT = [validation.validateReqStatus];
+export const REQ = [validation.validateRequest];
 
 export const SIM = [validation.validateSimulation];
 

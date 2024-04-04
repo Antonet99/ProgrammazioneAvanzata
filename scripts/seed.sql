@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS graph;
 DROP TABLE IF EXISTS request;
 
 CREATE TYPE user_role AS ENUM ('admin', 'user');
-CREATE TYPE request_status AS ENUM ('pending', 'accepted', 'rejected');
+CREATE TYPE request_status AS ENUM ('pending', 'accepted', 'denied');
 
 CREATE TABLE users (
     id_user SERIAL PRIMARY KEY NOT NULL,

@@ -152,6 +152,7 @@ export async function checkGraphRequest(graph_req: any[], list_req: any[]) {
 }
 
 export async function denyRequest(id_request: number, tr: Transaction) {
+  console.log(id_request);
   await Request.update(
     {
       req_status: "denied",
@@ -187,27 +188,28 @@ export async function acceptRequest(
         transaction: tr,
       }
     );
+    let graph = JSON.parse(graph_req.graph);
     for (let j in request.metadata) {
       let start = request.metadata[j].start;
       let end = request.metadata[j].end;
       let weight = request.metadata[j].weight;
-      let graph = JSON.parse(graph_req.graph);
+
+      console.log(start, end, weight, graph[start][end]);
 
       graph[start][end] = exp_avg(graph[start][end], weight);
-
-      await Graph.update(
-        {
-          graph: JSON.stringify(graph),
-        },
-        {
-          returning: false,
-          where: {
-            id_graph: request.req_graph,
-          },
-          transaction: tr,
-        }
-      );
     }
+    await Graph.update(
+      {
+        graph: JSON.stringify(graph),
+      },
+      {
+        returning: false,
+        where: {
+          id_graph: request.req_graph,
+        },
+        transaction: tr,
+      }
+    );
   } else {
     sendResponse(
       res,

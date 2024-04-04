@@ -64,3 +64,17 @@ export async function checkAdmin(req: any, res: any, next: any) {
     //res.status(500).send("Utente admin non trovato");
   }
 }
+
+export async function checkUser(req: any, res: any, next: any) {
+  try {
+    var user = await getUserByUsername(req.username);
+    if (!user) {
+      throw new Error();
+    }
+    req.user = user;
+    next();
+  } catch (error) {
+    sendResponse(res, HttpStatusCode.UNAUTHORIZED, Message.USER_NOT_FOUND);
+    return;
+  }
+}

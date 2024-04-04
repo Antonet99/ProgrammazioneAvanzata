@@ -148,7 +148,6 @@ export async function validateReqStatus(req: any, res: any, next: any) {
 }
 
 export async function validateSimulation(req: any, res: any, next: any) {
-  let id_graph: number = req.body.id_graph;
   let options = req.body.options;
   let route = req.body.route;
   let edge = req.body.edge;
@@ -156,11 +155,6 @@ export async function validateSimulation(req: any, res: any, next: any) {
   let start: number = options.start;
   let stop: number = options.stop;
   let step: number = options.step;
-
-  if (typeof id_graph !== "number" || id_graph <= 0) {
-    res.status(400).send({ error: "id_graph deve essere un numero positivo." });
-    return;
-  }
 
   if (typeof start !== "number" || start < 0) {
     res.status(400).send({ error: "start deve essere un numero positivo." });
@@ -236,6 +230,35 @@ export async function validateGraphId(req: any, res: any, next: any) {
   if (typeof id_graph !== "number" || id_graph <= 0) {
     sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
+  }
+  next();
+}
+
+export async function validateRequest(req: any, res: any, next: any) {
+  let id_request = req.body.id_request;
+  let accepted = req.body.accepted;
+
+  if (typeof id_request !== "object" || id_request.length == 0) {
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+    return;
+  }
+  if (typeof accepted !== "object" || accepted.length == 0) {
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+    return;
+  }
+  if (id_request.length !== accepted.length) {
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+    return;
+  }
+  for (let i in id_request) {
+    if (typeof id_request[i] !== "number" || id_request[i] <= 0) {
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+      return;
+    }
+    if (typeof accepted[i] !== "boolean") {
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+      return;
+    }
   }
   next();
 }
