@@ -9,6 +9,7 @@ export function validateGraph(
   res: Response,
   next: NextFunction
 ): void {
+
   const graph = req.body;
   if (Object.keys(graph).length == 0) {
     //res.status(400).json({ error: "Grafo mancante nella richiesta" });
@@ -98,37 +99,39 @@ export function validateDate(req: any, res: any, next: any) {
   const endDate = req.body.endDate;
 
   if (typeof id_graph !== "number" || id_graph <= 0) {
-    res
-      .status(400)
-      .send({ error: "id_graph deve essere un numero/numero positivo." });
+    //res.status(400).send({ error: "id_graph deve essere un numero/numero positivo." });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 
   if (startDate && endDate) {
     if (!Date.parse(startDate)) {
-      res.status(400).send({ error: "startDate deve essere una data valida." });
+      //res.status(400).send({ error: "startDate deve essere una data valida." });
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
       return;
     }
     if (!Date.parse(endDate)) {
-      res.status(400).send({ error: "endDate deve essere una data valida." });
+      //res.status(400).send({ error: "endDate deve essere una data valida." });
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
       return;
     }
     if (new Date(startDate) >= new Date(endDate)) {
-      res
-        .status(400)
-        .send({ error: "startDate deve essere prima di endDate." });
+      //res.status(400).send({ error: "startDate deve essere prima di endDate." });
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
       return;
     }
   }
 
   if (startDate && !endDate) {
     if (!Date.parse(startDate)) {
-      res.status(400).send({ error: "startDate deve essere una data valida." });
+      //res.status(400).send({ error: "startDate deve essere una data valida." });
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
       return;
     }
   } else if (!startDate && endDate) {
     if (!Date.parse(endDate)) {
-      res.status(400).send({ error: "endDate deve essere una data valida." });
+      //res.status(400).send({ error: "endDate deve essere una data valida." });
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
       return;
     }
   }
@@ -139,9 +142,8 @@ export async function validateReqStatus(req: any, res: any, next: any) {
   const req_status = req.body.status;
 
   if (req_status && req_status != "accepted" && req_status != "denied") {
-    res
-      .status(400)
-      .send({ error: "status deve essere 'accepted' o 'denied'." });
+    //res.status(400).send({ error: "status deve essere 'accepted' o 'denied'." });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
   next();
@@ -157,51 +159,58 @@ export async function validateSimulation(req: any, res: any, next: any) {
   let step: number = options.step;
 
   if (typeof start !== "number" || start < 0) {
-    res.status(400).send({ error: "start deve essere un numero positivo." });
+    //res.status(400).send({ error: "start deve essere un numero positivo." });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 
   if ((typeof stop !== "number" || stop < 0) && stop < start) {
-    res.status(400).send({ error: "stop deve essere un numero positivo." });
+    //res.status(400).send({ error: "stop deve essere un numero positivo." });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 
   if (start == stop) {
-    res.status(400).send({ error: "start e stop non possono essere uguali." });
+    //res.status(400).send({ error: "start e stop non possono essere uguali." });
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 
   if (typeof step !== "number" || step <= 0 || step > stop - start) {
-    res.status(400).send({
-      error:
-        "step deve essere un numero strettamente positivo e minore di stop - start",
-    });
+    //res.status(400).send({ error: "step deve essere un numero strettamente positivo e minore di stop - start",});
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 
   if (!route.start || typeof route.start != "string") {
-    res.status(400).send("start vuoto/null");
+    //res.status(400).send("start vuoto/null");
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
   if (!route.goal || typeof route.goal != "string") {
-    res.status(400).send("goal vuot/null");
+    //res.status(400).send("goal vuot/null");
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 
   if (route.start === route.goal) {
-    res.status(400).send("nodo di partenza e nodo di arrivo uguali");
+    //res.status(400).send("nodo di partenza e nodo di arrivo uguali");
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
   if (!edge.node1) {
-    res.status(400).send("nodo1 vuoto/null");
+    //res.status(400).send("nodo1 vuoto/null");
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
   if (!edge.node2) {
-    res.status(400).send("nodo2 vuoto/null");
+    //res.status(400).send("nodo2 vuoto/null");
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
   if (edge.node1 === edge.node2) {
-    res.status(400).send("nodo1 e node2 uguali");
+    //res.status(400).send("nodo1 e node2 uguali");
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
   next();

@@ -152,7 +152,7 @@ export async function checkGraphRequest(graph_req: any[], list_req: any[]) {
 }
 
 export async function denyRequest(id_request: number, tr: Transaction) {
-  console.log(id_request);
+  //console.log(id_request);
   await Request.update(
     {
       req_status: "denied",

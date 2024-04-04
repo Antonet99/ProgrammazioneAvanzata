@@ -22,7 +22,8 @@ const GraphD = require("node-dijkstra");
 
 export async function createGraph(req: any, res: Response) {
   const graph = req.body;
-  let user = await getUserByUsername(req.username);
+  
+  let user = req.user;
 
   const nodes = Utils.nodes_count(graph);
   const edges = Utils.edges_count(graph);
@@ -80,8 +81,10 @@ export async function updateWeight(req: any, res: any) {
   const requests_b = req.body;
   const username = req.username;
 
-  const user = await validateUser(username, res);
-  if (!user) return;
+  //const user1 = await validateUser(username, res);
+  //if (!user) return;
+
+  const user = req.user;
 
   /*   const graph_id = await validateGraphId(requests_b, res);
   if (!graph_id) return; */
@@ -90,7 +93,7 @@ export async function updateWeight(req: any, res: any) {
   try {
     var graph_obj: any = await getGraphById(graph_id);
   } catch (error) {
-    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_GRAPH_NOT_FOUND);
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.GRAPH_NOT_FOUND);
     return;
   }
 
@@ -191,12 +194,14 @@ export async function executeModel(req: any, res: any) {
   let id_graph = req.body.id_graph;
   let start = req.body.start;
   let goal = req.body.goal;
+  
+  let user = req.user;
 
   try {
-    var user = await getUserByUsername(req.username);
+    //var user = await getUserByUsername(req.username);
     var graph_obj = await getGraphById(id_graph);
   } catch (error) {
-    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_GRAPH_NOT_FOUND);
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.GRAPH_NOT_FOUND);
     return;
   }
 
@@ -251,7 +256,8 @@ export async function acceptDenyRequest(req: any, res: any) {
   let id_request: number[] = req.body.id_request;
   let accepted: boolean[] = req.body.accepted;
 
-  let user = await getUserByUsername(req.username);
+  //let user = await getUserByUsername(req.username);
+  let user = req.user;
   let id_user = user.id_user;
 
   let list_req: any[] = [];
@@ -263,10 +269,12 @@ export async function acceptDenyRequest(req: any, res: any) {
       list_req,
       list_user
     );
+
     if (!find) {
       sendResponse(res, HttpStatusCode.NOT_FOUND, Message.REQUEST_NOT_FOUND);
       return;
     }
+
   } catch (error) {
     sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
     return;
@@ -310,6 +318,7 @@ export async function acceptDenyRequest(req: any, res: any) {
         );
       }
     }
+
     await tr.commit();
   } catch (error) {
     console.log(error);
@@ -324,12 +333,13 @@ export async function acceptDenyRequest(req: any, res: any) {
 export async function rechargeTokens(req: any, res: any) {
   let tokens = req.body.tokens;
 
-  try {
+  /*try {
     var user = await getUserByUsername(req.body.username); //user a cui ricaricare
   } catch (error) {
     sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_NOT_FOUND);
     return;
-  }
+  }*/
+  let user = req.user;
 
   const tr = await SeqDb.SequelizeDB.getConnection().transaction();
 
@@ -338,6 +348,7 @@ export async function rechargeTokens(req: any, res: any) {
     sendResponse(res, HttpStatusCode.OK, Message.TOKENS_RECHARGED);
     await tr.commit();
   } catch (error) {
+
     sendResponse(
       res,
       HttpStatusCode.INTERNAL_SERVER_ERROR,
@@ -363,6 +374,7 @@ export async function getGraphRequest(req: any, res: any) {
         reqStatus
       );
       sendResponse(res, HttpStatusCode.OK, undefined, result);
+
     } else {
       let result = await UpdateRequest.getGraphRequests(
         req.body.id_graph,
@@ -370,6 +382,7 @@ export async function getGraphRequest(req: any, res: any) {
       );
       sendResponse(res, HttpStatusCode.OK, undefined, result);
     }
+
   } catch (error) {
     sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
   }
