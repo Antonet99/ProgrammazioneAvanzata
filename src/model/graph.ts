@@ -70,23 +70,16 @@ export async function getAllGraph() {
   let result: any;
   result = await Graph.findAll({
     raw: true,
-    attributes: [
-      "id_graph",
-      "nodes",
-      "edges",
-      "graph_cost",
-      "id_creator",
-      "graph",
-    ],
+    attributes: ["id_graph", "nodes", "edges", "graph_cost", "id_creator"],
   });
   return result;
 }
 
-export async function validateGraphId(requests_b: any, res: Response) {
+/* export async function validateGraphId(requests_b: any, res: Response) {
   const graph_id = requests_b["graph_id"];
   if (!graph_id) {
     sendResponse(res, HttpStatusCode.NOT_FOUND, Message.GRAPH_NOT_FOUND);
     return null;
   }
   return graph_id;
-}
+} */

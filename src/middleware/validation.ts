@@ -36,7 +36,9 @@ export function validateGraph(
         node == edge
       ) {
         //res.status(400).json({ error: `Peso dell'arco ${graph[node][edge]} non valido` });
-        sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.BAD_REQUEST, {invalid_edge : graph[node][edge]} );
+        sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.BAD_REQUEST, {
+          invalid_edge: graph[node][edge],
+        });
         return;
       }
     }
@@ -52,35 +54,41 @@ export async function validateUpdateRequest(
 ): Promise<void> {
   const requests = req.body;
 
-  if (Object.keys(requests).length == 0) {
+  if (!requests) {
     //res.status(400).json({ error: "Richiesta mancante nel body" });
     sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MISSING_BODY);
     return;
   }
 
-  // Validazione della struttura della richiesta
-  if (
-    typeof requests !== "object" // verifica che requests sia un oggetto
-  ) {
-    //res.status(400).json({ error: "Struttura della richiesta non valida" });
-    sendResponse(res,HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD)
-    return;
-  }
-
-  if (
-    Object.values(requests).some(
-      (request) =>
-        typeof requests.start !== "string" &&
-        typeof requests.end !== "string" &&
-        typeof requests.weight !== "number" &&
-        requests.weight < 0
-    )
-  ) {
-    //res.status(400).json({ error: "Struttura della richiesta non valida" });
+  if (typeof requests.graph_id !== "number") {
     sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
     return;
   }
 
+  let data = requests.data;
+
+  for (let i in data) {
+    if (
+      typeof data[i].start !== "string" ||
+      !data[i].start ||
+      data[i].start == ""
+    ) {
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+      return;
+    }
+    if (typeof data[i].end !== "string" || !data[i].end || data[i].end == "") {
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+      return;
+    }
+    if (typeof data[i].weight !== "number") {
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+      return;
+    }
+    if (data[i].weight < 0) {
+      sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+      return;
+    }
+  }
   next();
 }
 
@@ -177,11 +185,11 @@ export async function validateSimulation(req: any, res: any, next: any) {
     return;
   }
 
-  if (!route.start) {
+  if (!route.start || typeof route.start != "string") {
     res.status(400).send("start vuoto/null");
     return;
   }
-  if (!route.goal) {
+  if (!route.goal || typeof route.goal != "string") {
     res.status(400).send("goal vuot/null");
     return;
   }
@@ -190,21 +198,44 @@ export async function validateSimulation(req: any, res: any, next: any) {
     res.status(400).send("nodo di partenza e nodo di arrivo uguali");
     return;
   }
-
   if (!edge.node1) {
     res.status(400).send("nodo1 vuoto/null");
     return;
   }
-
   if (!edge.node2) {
     res.status(400).send("nodo2 vuoto/null");
     return;
   }
-
   if (edge.node1 === edge.node2) {
     res.status(400).send("nodo1 e node2 uguali");
     return;
   }
+  next();
+}
 
+export async function validateRecharge(req: any, res: any, next: any) {
+  let username = req.body.username;
+  let tokens = req.body.tokens;
+
+  if (!username) {
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+    return;
+  }
+
+  if (!tokens || typeof tokens !== "number" || tokens <= 0) {
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD, {
+      error: "Tokens deve essere maggiore di zero",
+    });
+    return;
+  }
+  next();
+}
+
+export async function validateGraphId(req: any, res: any, next: any) {
+  let id_graph = req.body.id_graph;
+  if (typeof id_graph !== "number" || id_graph <= 0) {
+    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.MALFORMED_PAYLOAD);
+    return;
+  }
   next();
 }

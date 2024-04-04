@@ -5,20 +5,24 @@ export function sendResponse(
   res: any,
   status: HttpStatusCode,
   message?: Messages,
-  obj? : object
+  obj?: object
 ) {
-
-  if(message){
+  if (message) {
     res.status(status).json({ message: message });
     return;
   }
 
-  if(obj){
+  if (obj) {
     res.status(status).json(obj);
+    return;
   }
 
-  if(!message && !obj){
+  if (!message && !obj) {
     res.status(status).send();
+    return;
   }
-  
+
+  if (message && obj) {
+    res.status(status).json({ message: message, data: obj });
+  }
 }

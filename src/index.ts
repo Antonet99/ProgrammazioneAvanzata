@@ -12,6 +12,9 @@ const port = process.env.API_PORT;
 
 app.use(express.json());
 app.use(router);
+/* app.use("*", (req, res) => {
+  res.status(404).send("La pagina che stai cercando non esiste.");
+}); */
 
 app.listen(port, () => {
   console.log(`App in ascolto sulla porta ${port}...`);

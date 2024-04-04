@@ -9,6 +9,7 @@ export const AUTH = [
 ];
 
 export const GRAPH = [validation.validateGraph];
+export const GRAPH_ID = [validation.validateGraphId];
 
 export const UPDATE = [validation.validateUpdateRequest];
 
@@ -16,3 +17,5 @@ export const DATE = [validation.validateDate];
 export const REQ = [validation.validateReqStatus];
 
 export const SIM = [validation.validateSimulation];
+
+export const ADMIN = [authorization.checkAdmin, validation.validateRecharge];

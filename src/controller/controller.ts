@@ -5,13 +5,7 @@ import {
   validateUser,
 } from "../model/users";
 
-import {
-  Graph,
-  insertGraph,
-  getGraphById,
-  getAllGraph,
-  validateGraphId,
-} from "../model/graph";
+import { Graph, insertGraph, getGraphById, getAllGraph } from "../model/graph";
 import GraphBuilder from "../builders/graphBuilder";
 
 import * as UpdateRequest from "../model/request";
@@ -89,16 +83,20 @@ export async function updateWeight(req: any, res: any) {
   const user = await validateUser(username, res);
   if (!user) return;
 
-  const graph_id = await validateGraphId(requests_b, res);
-  if (!graph_id) return;
+  /*   const graph_id = await validateGraphId(requests_b, res);
+  if (!graph_id) return; */
+  const graph_id = requests_b.graph_id;
 
-  const graph_obj: any = await getGraphById(graph_id).catch((error) => {
-    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+  try {
+    var graph_obj: any = await getGraphById(graph_id);
+  } catch (error) {
+    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_GRAPH_NOT_FOUND);
     return;
-  });
+  }
 
-  const graph = JSON.parse(graph_obj.graph);
+  let graph = JSON.parse(graph_obj.graph);
   let data = requests_b["data"];
+  console.log(data);
   let costo_richiesta = Object.keys(data).length * 0.025;
 
   if (user.id_user == graph_obj.id_creator) {
@@ -115,10 +113,12 @@ export async function updateWeight(req: any, res: any) {
     const tr = await SeqDb.SequelizeDB.getConnection().transaction();
 
     try {
-      let start = data.start;
-      let end = data.end;
-      let weight = data.weight;
-      graph[start][end] = Utils.exp_avg(graph[start][end], weight);
+      for (let i in data) {
+        let start = data[i].start;
+        let end = data[i].end;
+        let weight = data[i].weight;
+        graph[start][end] = Utils.exp_avg(graph[start][end], weight);
+      }
 
       await Graph.update(
         {
@@ -132,6 +132,7 @@ export async function updateWeight(req: any, res: any) {
           transaction: tr,
         }
       );
+      console.log("graph updated");
 
       await UpdateRequest.Request.create(
         {
@@ -181,6 +182,10 @@ export async function updateWeight(req: any, res: any) {
 export async function getGraphPendingRequests(req: any, res: any) {
   let id_graph = req.body.id_graph;
   let result = await UpdateRequest.getPendingRequests(id_graph);
+  if (result.length == 0) {
+    sendResponse(res, HttpStatusCode.OK, Message.NO_PENDING_REQUEST);
+    return;
+  }
   sendResponse(res, HttpStatusCode.OK, undefined, result);
 }
 
@@ -322,29 +327,19 @@ export async function acceptDenyRequest(req: any, res: any) {
 }
 
 export async function rechargeTokens(req: any, res: any) {
-  let admin = await getUserByUsername(req.username); //user admin che ricarica
-  let user = await getUserByUsername(req.body.username); //user a cui ricaricare
-  let amount = req.body.amount;
+  let tokens = req.body.tokens;
 
-  if (!admin || admin.role != "admin") {
-    sendResponse(res, HttpStatusCode.NOT_FOUND, Message.ADMIN_NOT_FOUND);
-    return;
-  }
-
-  if (!user) {
+  try {
+    var user = await getUserByUsername(req.body.username); //user a cui ricaricare
+  } catch (error) {
     sendResponse(res, HttpStatusCode.NOT_FOUND, Message.USER_NOT_FOUND);
-    return;
-  }
-
-  if (amount <= 0) {
-    sendResponse(res, HttpStatusCode.BAD_REQUEST, Message.INVALID_IMPORT);
     return;
   }
 
   const tr = await SeqDb.SequelizeDB.getConnection().transaction();
 
   try {
-    await tokenUpdate(user.tokens + amount, user.username, tr);
+    await tokenUpdate(user.tokens + tokens, user.username, tr);
     sendResponse(res, HttpStatusCode.OK, Message.TOKENS_RECHARGED);
     await tr.commit();
   } catch (error) {
@@ -411,7 +406,7 @@ export async function simulateModel(req: any, res: any) {
   };
 
   for (let i = start + step; i <= stop + step; i += step) {
-    graph[edge.node1][edge.node2] = i;
+    graph[edge.node1][edge.node2] = parseFloat(i.toFixed(3));
     let g = new GraphD(graph);
     let execute = g.path(route.start, route.goal, { cost: true });
 

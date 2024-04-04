@@ -8,8 +8,8 @@ router.post(
   "/createGraph",
   Middleware.AUTH,
   Middleware.GRAPH,
-  function (req: any, res: any) {
-    Controller.createGraph(req, res);
+  async function (req: any, res: any) {
+    await Controller.createGraph(req, res);
   }
 );
 
@@ -29,8 +29,9 @@ router.post(
 router.post(
   "/graphPendingRequests",
   Middleware.AUTH,
+  Middleware.GRAPH_ID,
   async function (req: any, res: any) {
-    Controller.getGraphPendingRequests(req, res);
+    await Controller.getGraphPendingRequests(req, res);
   }
 );
 
@@ -50,9 +51,14 @@ router.post(
   }
 );
 
-router.post("/rechargeTokens", Middleware.AUTH, function (req: any, res: any) {
-  Controller.rechargeTokens(req, res);
-});
+router.post(
+  "/rechargeTokens",
+  Middleware.AUTH,
+  Middleware.ADMIN,
+  function (req: any, res: any) {
+    Controller.rechargeTokens(req, res);
+  }
+);
 
 router.post(
   "/getGraphRequests",
