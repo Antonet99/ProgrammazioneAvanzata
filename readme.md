@@ -126,12 +126,12 @@ Esempio di **payload:**
 
 ### - Approvazione o rifiuto delle richieste di aggiornamento
 
-**Rotta:** `POST /acceptRequest`
+**Rotta:** `POST /acceptDenyRequest`
 
 **Parametri query:**
 
 - `id_request`: lista di richieste relative al grafo che si vuole accettare/rifiutare
-- `accepted`: valore booleano relativo alla richiesta che si vuole accettare/rifiutare
+- `accepted`: lista di valori booleani relativi alla richiesta che si vuole accettare/rifiutare
 
 Esempio di **payload:**
 
