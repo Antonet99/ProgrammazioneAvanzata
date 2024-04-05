@@ -244,6 +244,12 @@ Esempio di **payload:**
 }
 ```
 
+### - Recupero di tutte le richieste di modifica per un utente proprietario di un modello
+
+**Rotta:** `GET /getMyPendingRequest
+
+Per questa rotta è necessaria soltanto l'autenticazione, ma non la specificazione di parametri all'interno del body
+
 ### - Recupero di tutti i grafi dal database
 
 **Rotta:** `GET /getAllGraph`
@@ -269,7 +275,7 @@ Procedura di avvio:
 DB_NAME=pa
 DB_USER=postgres
 DB_PASS=postgres
-DB_HOST=db
+DB_HOST=localhost
 DB_PORT=5432
 TZ=Europe/Rome
 API_PORT=3000
