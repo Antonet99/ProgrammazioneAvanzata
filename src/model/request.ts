@@ -55,8 +55,6 @@ export const Request = sequelize.define(
   }
 );
 
-//get request
-
 export async function getPendingRequests(id_graph: number) {
   let result: any;
   result = await Request.findAll({
@@ -196,7 +194,9 @@ export async function acceptRequest(
 
       //console.log(start, end, weight, graph[start][end]);
 
-      graph[start][end] = parseFloat(exp_avg(graph[start][end], weight).toFixed(3));
+      graph[start][end] = parseFloat(
+        exp_avg(graph[start][end], weight).toFixed(3)
+      );
     }
     await Graph.update(
       {

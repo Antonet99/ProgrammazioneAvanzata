@@ -81,4 +81,12 @@ router.post(
   }
 );
 
+router.post(
+  "/getMyPendingRequests",
+  Middleware.AUTH,
+  async function (req: any, res: any) {
+    Controller.getMyPendingRequests(req, res);
+  }
+);
+
 export default router;

@@ -5,7 +5,7 @@ import GraphBuilder from "../builders/graphBuilder";
 
 import * as UpdateRequest from "../model/request";
 
-import { Response } from "express";
+import { raw, Response } from "express";
 import * as Utils from "../utils/utils";
 import { sendResponse } from "../utils/messages_sender";
 import HttpStatusCode from "../utils/http_status_code";
@@ -128,7 +128,9 @@ export async function updateWeight(req: any, res: any) {
         let start = data[i].start;
         let end = data[i].end;
         let weight = data[i].weight;
-        graph[start][end] = parseFloat(Utils.exp_avg(graph[start][end], weight).toFixed(3));
+        graph[start][end] = parseFloat(
+          Utils.exp_avg(graph[start][end], weight).toFixed(3)
+        );
       }
 
       await Graph.update(
@@ -470,4 +472,50 @@ export async function simulateModel(req: any, res: any) {
     }
   }
   sendResponse(res, HttpStatusCode.OK, undefined, { best: best, list: list });
+}
+/* 
+export async function getMyPendingRequests(req: any, res: any) {
+  let user = req.user;
+  try {
+    let result = await UpdateRequest.getMyPendingRequests(user.id_user);
+    if (result.length == 0) {
+      sendResponse(res, HttpStatusCode.OK, Message.NO_PENDING_REQUEST);
+      return;
+    }
+    sendResponse(res, HttpStatusCode.OK, undefined, result);
+  } catch (error) {
+    sendResponse(
+      res,
+      HttpStatusCode.INTERNAL_SERVER_ERROR,
+      Message.DEFAULT_ERROR
+    );
+  }
+} */
+
+export async function getMyPendingRequests(req: any, res: any) {
+  const user = req.user;
+  try {
+    const id_graphs: any = await Graph.findAll({
+      where: { id_creator: user.id_user },
+      attributes: ["id_graph"],
+      raw: true,
+    });
+
+    const id_graphs_array = id_graphs.map((id: any) => id.id_graph);
+
+    const pendingRequests = await UpdateRequest.Request.findAll({
+      where: { req_status: "pending", req_graph: id_graphs_array },
+      raw: true,
+    });
+
+    if (pendingRequests.length === 0) {
+      sendResponse(res, HttpStatusCode.OK, Message.NO_PENDING_REQUEST);
+      return;
+    }
+
+    sendResponse(res, HttpStatusCode.OK, undefined, pendingRequests);
+  } catch (error) {
+    sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
+    return;
+  }
 }

@@ -4,7 +4,7 @@ import { User } from "./users";
 import { sendResponse } from "../utils/messages_sender";
 import HttpStatusCode from "../utils/http_status_code";
 import Message from "../utils/messages_string";
-//import sequelize from "sequelize";
+import { Request } from "./request";
 
 const sequelize = SequelizeDB.getConnection();
 

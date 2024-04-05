@@ -4,6 +4,8 @@ import { Sequelize, DataTypes, where, Transaction } from "sequelize";
 import { sendResponse } from "../utils/messages_sender";
 import HttpStatusCode from "../utils/http_status_code";
 import Message from "../utils/messages_string";
+import { Request } from "./request";
+import { Graph } from "./graph";
 
 const sequelize = SequelizeDB.getConnection();
 
