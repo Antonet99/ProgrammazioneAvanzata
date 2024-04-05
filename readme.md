@@ -33,7 +33,7 @@ Inoltre, sono stati inoltre utilizzati i seguenti design pattern:
 
 Il pattern Singleton, incluso nei Creational Design Patterns, garantisce l’unicità dell’istanza di una classe, rendendola disponibile a livello globale. Questo pattern è stato adottato per stabilire una connessione univoca con il database, assicurando l’uso coerente della stessa istanza. Nello specifico, l’implementazione del Singleton si trova nel file sequelize.ts.
 
-### **Chain of Responsability (CoR)**
+### **Chain of Responsibility (CoR)**
 
 Il pattern Chain of Responsibility (CoR), appartenente ai Behavioural Design Patterns, consente di gestire una richiesta eseguendo una serie di funzioni connesse in sequenza. In Express, il CoR si concretizza attraverso l’uso dei middleware, che fungono da anelli di una catena. Questo pattern è stato impiegato per selezionare le richieste HTTP, assicurando che solo quelle valide raggiungano il Controller; per ciascuna rotta è stata creata una catena di middleware che include:
 
@@ -45,31 +45,6 @@ Il pattern Chain of Responsibility (CoR), appartenente ai Behavioural Design Pat
 ### **Builder**
 
 Il pattern Builder separa la costruzione di un oggetto complesso dalla sua rappresentazione, consentendo lo stesso processo di costruzione per creare diverse rappresentazioni. Nel caso specifico, il Builder è stato utilizzato per la costruzione dei grafi, elementi che nel nostro programma hanno diversi attributi: questa soluzione fornisce un’interfaccia per la costruzione dell’oggetto passo dopo passo, e può permettere di costruire l’oggetto in diverse varianti, senza che il codice cliente sia influenzato dai cambiamenti nella costruzione dell’oggetto stesso.
-
-## Avvio del Progetto
-
-## Avvio del servizio
-
-Prerequisiti:
-
-- Ambiente Docker installato sulla propria macchina
-
-Procedura di avvio:
-
-- Posizionarsi nella cartella clonata dal seguente repository
-- Eseguire il seguente comando: (sostituire 'mysecretkey' con la chiave con la quale verranno generati i token JWT)
-
-```
-$ echo 'KEY=mysecretkey' >> .env
-```
-
-- Avviare il servizio Docker tramite il comando:
-
-```
-$ docker-compose up
-```
-
-- Eseguire le richieste sulla porta 3000 tramite cURL o Postman
 
 ## Esempi di Chiamate API
 
@@ -237,19 +212,19 @@ Esempio di **payload:**
 ```json
 {
   "id_graph": 1,
-  "options": {
-    "start": 1,
-    "stop": 2,
-    "step": 0.1
-  },
-  "route": {
-    "start": "A",
-    "goal": "D"
-  },
-  "edge": {
-    "node1": "A",
-    "node2": "B"
-  }
+  "options":  {
+	    "start": 1,
+	    "stop": 2,
+	    "step": 0.1
+	    }
+  "route":  {
+	    "start": "A",
+	    "goal": "D"
+	    }
+	"edge":  {
+		"node1": "A",
+		"node2": "B",
+		}
 }
 ```
 
@@ -261,9 +236,50 @@ Per questa rotta non è necessaria nè l'autenticazione nè la specificazione di
 
 Questi sono gli esempi delle principali chiamate API disponibili nel sistema.
 
+## Avvio del servizio
+
+All'avvio del servizio tramite Docker, al fine di poter utilizzare l'app, il database verrà popolato con alcuni `user` (per maggiori info si rimanda al file `seed.sql`).
+
+Prerequisiti:
+
+- Ambiente Docker installato sulla propria macchina
+
+Procedura di avvio:
+
+- Posizionarsi nella cartella clonata dal seguente repository
+- Creare, all'interno della root del progetto, un file ".env" con la seguente struttura:
+
+```
+DB_NAME=pa
+DB_USER=postgres
+DB_PASS=postgres
+DB_HOST=db
+DB_PORT=5432
+TZ=Europe/Rome
+API_PORT=3000
+JWT_KEY="mysecretkey"
+ALPHA=0.5
+```
+
+E' necessario sostituire il valore di "JWT_KEY" con la chiave con la quale verranno generati i token JWT.
+
+- Effettuare la costruzione dell'immagine Docker della web app tramite il comando
+
+```
+$ docker build -t "nome_app" .
+```
+
+- Avviare il servizio Docker tramite il comando:
+
+```
+$ docker-compose up
+```
+
+- Eseguire le richieste sulla porta 3000 tramite cURL o Postman
+
 ## Test del progetto
 
-Si può procedere con l’esecuzione di una serie di test già configurati importando, all'interno di Postman, la collection `postman_collection.json`, che si trova nella directory principale del repository. I token JWT inclusi sono stati creati utilizzando la chiave ‘mysecretkey’.
+Si può procedere con l’esecuzione di una serie di test già configurati importando, all'interno di Postman, la collection `postman_collection.json` che si trova nella directory principale del repository. I token JWT inclusi sono stati creati utilizzando la chiave ‘mysecretkey’.
 
 ## Note
 
