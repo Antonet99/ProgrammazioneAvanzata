@@ -194,9 +194,9 @@ export async function acceptRequest(
       let end = request.metadata[j].end;
       let weight = request.metadata[j].weight;
 
-      console.log(start, end, weight, graph[start][end]);
+      //console.log(start, end, weight, graph[start][end]);
 
-      graph[start][end] = exp_avg(graph[start][end], weight);
+      graph[start][end] = parseFloat(exp_avg(graph[start][end], weight).toFixed(3));
     }
     await Graph.update(
       {

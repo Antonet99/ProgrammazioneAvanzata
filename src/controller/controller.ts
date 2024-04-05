@@ -119,7 +119,7 @@ export async function updateWeight(req: any, res: any) {
         let start = data[i].start;
         let end = data[i].end;
         let weight = data[i].weight;
-        graph[start][end] = Utils.exp_avg(graph[start][end], weight);
+        graph[start][end] = parseFloat(Utils.exp_avg(graph[start][end], weight).toFixed(3));
       }
 
       await Graph.update(
@@ -320,7 +320,7 @@ export async function acceptDenyRequest(req: any, res: any) {
 
     await tr.commit();
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     sendResponse(res, HttpStatusCode.INTERNAL_SERVER_ERROR);
     await tr.rollback();
     return;
