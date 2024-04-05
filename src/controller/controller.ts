@@ -229,7 +229,7 @@ export async function executeModel(req: any, res: any) {
     sendResponse(res, HttpStatusCode.OK, undefined, result);
     //res.status(200).send(result);
 
-    await tokenUpdate(user.tokens - graph_obj.costo, user.username, tr);
+    await tokenUpdate(user.tokens - graph_obj.graph_cost, user.username, tr);
     await tr.commit();
   } catch (error: any) {
     sendResponse(
