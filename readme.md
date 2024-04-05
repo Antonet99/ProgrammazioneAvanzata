@@ -46,6 +46,19 @@ Il pattern Chain of Responsibility (CoR), appartenente ai Behavioural Design Pat
 
 Il pattern Builder separa la costruzione di un oggetto complesso dalla sua rappresentazione, consentendo lo stesso processo di costruzione per creare diverse rappresentazioni. Nel caso specifico, il Builder è stato utilizzato per la costruzione dei grafi, elementi che nel nostro programma hanno diversi attributi: questa soluzione fornisce un’interfaccia per la costruzione dell’oggetto passo dopo passo, e può permettere di costruire l’oggetto in diverse varianti, senza che il codice cliente sia influenzato dai cambiamenti nella costruzione dell’oggetto stesso.
 
+## Progettazione - UML
+
+Di seguito vengono riportati i diagrammi UML:
+
+- Use Case Diagram
+- Sequence Diagram
+
+![GETallGraphs](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/GETallGraphs.png)
+![POSTexecuteModel](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTexecuteModel.png)
+![POSTgetGraphRequests](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTgetGraphRequests.png)
+![POSTgraphPendingRequests](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTgraphPendingRequests.png)
+![POSTrechargeTokens](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTrechargeTokens.png)
+
 ## Esempi di Chiamate API
 
 | TIPO | ROTTA                 | JWT |
