@@ -53,6 +53,8 @@ Di seguito vengono riportati i diagrammi UML:
 - Use Case Diagram
 - Sequence Diagram
 
+![usecase](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/usecase.png)
+
 ![GETallGraphs](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/GETallGraphs.png)
 ![POSTexecuteModel](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTexecuteModel.png)
 ![POSTgetGraphRequests](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTgetGraphRequests.png)
@@ -70,7 +72,8 @@ Di seguito vengono riportati i diagrammi UML:
 | POST | /rechargeTokens       | Sì  |
 | POST | /getGraphRequests     | Sì  |
 | POST | /graphPendingRequests | Sì  |
-| POST | /executeModel         | Sì  |
+| POST | /getMyPendingRequest  | Sì  |
+| POST | /simulateModel        | Sì  |
 | GET  | /getAllGraph          | No  |
 
 ### - Creazione di un nuovo modello
