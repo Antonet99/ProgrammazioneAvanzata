@@ -30,8 +30,10 @@ export function edges_count(obj: object): number {
 }
 
 export function checkAlpha() {
+  console.log(process.env.ALPHA!);
   try {
     alpha = parseFloat(process.env.ALPHA!);
+    console.log(alpha);
     if (alpha <= 0 || alpha > 1) {
       throw Error("Invalid alpha");
     }

@@ -1,9 +1,4 @@
-import {
-  getUserByUsername,
-  getUserById,
-  tokenUpdate,
-  validateUser,
-} from "../model/users";
+import { getUserByUsername, tokenUpdate } from "../model/users";
 
 import { Graph, insertGraph, getGraphById, getAllGraph } from "../model/graph";
 import GraphBuilder from "../builders/graphBuilder";
@@ -20,6 +15,13 @@ import * as SeqDb from "../singleton/sequelize";
 
 const GraphD = require("node-dijkstra");
 
+/**
+ * Creates a graph based on the request body and performs necessary operations.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A Promise that resolves when the graph is created and operations are performed successfully.
+ */
 export async function createGraph(req: any, res: Response) {
   const graph = req.body;
 
@@ -65,6 +67,13 @@ export async function createGraph(req: any, res: Response) {
   }
 }
 
+/**
+ * Retrieves all graphs.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A Promise that resolves to the result of retrieving all graphs.
+ */
 export async function getAllGraphs(req: any, res: any) {
   try {
     sendResponse(res, HttpStatusCode.OK, undefined, await getAllGraph());
@@ -77,17 +86,18 @@ export async function getAllGraphs(req: any, res: any) {
   }
 }
 
+/**
+ * Updates the weight of edges in a graph based on the provided data.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A promise that resolves to the updated graph or an error response.
+ */
 export async function updateWeight(req: any, res: any) {
   const requests_b = req.body;
   const username = req.username;
 
-  //const user1 = await validateUser(username, res);
-  //if (!user) return;
-
   const user = req.user;
-
-  /*   const graph_id = await validateGraphId(requests_b, res);
-  if (!graph_id) return; */
   const graph_id = requests_b.graph_id;
 
   try {
@@ -102,7 +112,6 @@ export async function updateWeight(req: any, res: any) {
   let costo_richiesta = Object.keys(data).length * 0.025;
 
   if (user.id_user == graph_obj.id_creator) {
-    //check se ho i tokens e li sottraggo anche
     if (user.tokens < costo_richiesta) {
       sendResponse(
         res,
@@ -180,6 +189,12 @@ export async function updateWeight(req: any, res: any) {
   }
 }
 
+/**
+ * Retrieves the pending requests for a specific graph.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A promise that resolves to the pending requests for the specified graph.
+ */
 export async function getGraphPendingRequests(req: any, res: any) {
   let id_graph = req.body.id_graph;
   let result = await UpdateRequest.getPendingRequests(id_graph);
@@ -190,6 +205,12 @@ export async function getGraphPendingRequests(req: any, res: any) {
   sendResponse(res, HttpStatusCode.OK, undefined, result);
 }
 
+/**
+ * Executes the model based on the provided request data.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A Promise that resolves when the model execution is complete.
+ */
 export async function executeModel(req: any, res: any) {
   let id_graph = req.body.id_graph;
   let start = req.body.start;
@@ -227,7 +248,6 @@ export async function executeModel(req: any, res: any) {
     };
 
     sendResponse(res, HttpStatusCode.OK, undefined, result);
-    //res.status(200).send(result);
 
     await tokenUpdate(user.tokens - graph_obj.graph_cost, user.username, tr);
     await tr.commit();
@@ -237,21 +257,17 @@ export async function executeModel(req: any, res: any) {
       HttpStatusCode.INTERNAL_SERVER_ERROR,
       Message.MODEL_EXECUTION_ERROR
     );
-    //res.status(500).send("Errore nell'esecuzione del modello: " + error.message);
     tr.rollback();
   }
 }
 
-/*   const listaValori = [valore1, valore2, valore3]; // Aggiungi qui i tuoi valori
-  // Eseguire la query
-  const risultati = await Model.findAll({
-    where: {
-      tuoCampo: {
-        [Op.in]: listaValori
-      }
-    }
-  }); */
-
+/**
+ * Accepts or denies a request based on the provided parameters.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A promise that resolves to the response object.
+ */
 export async function acceptDenyRequest(req: any, res: any) {
   let id_request: number[] = req.body.id_request;
   let accepted: boolean[] = req.body.accepted;
@@ -329,6 +345,12 @@ export async function acceptDenyRequest(req: any, res: any) {
   sendResponse(res, HttpStatusCode.OK, Message.REQUESTS_ACCEPTED_DENIED);
 }
 
+/**
+ * Recharges tokens for a user.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ */
 export async function rechargeTokens(req: any, res: any) {
   let tokens = req.body.tokens;
   let username = req.body.username;
@@ -356,6 +378,13 @@ export async function rechargeTokens(req: any, res: any) {
   }
 }
 
+/**
+ * Handles the HTTP GET request to retrieve graph data.
+ *
+ * @param req - The HTTP request object.
+ * @param res - The HTTP response object.
+ * @returns A Promise that resolves to the graph data.
+ */
 export async function getGraphRequest(req: any, res: any) {
   let startDate = req.body.startDate;
   let endDate = req.body.endDate;
@@ -384,6 +413,11 @@ export async function getGraphRequest(req: any, res: any) {
   }
 }
 
+/**
+ * Simulates a model based on the provided request parameters.
+ * @param req - The request object.
+ * @param res - The response object.
+ */
 export async function simulateModel(req: any, res: any) {
   let id_graph: number = req.body.id_graph;
   let options = req.body.options;
