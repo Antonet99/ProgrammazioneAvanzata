@@ -64,7 +64,7 @@ Di seguito vengono riportati i diagrammi UML:
 ![POSTrechargeTokens](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTrechargeTokens.png)
 ![POSTgetMyPendingRequest](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/getMyPendingRequest.png)
 ![POSTsimulateModel](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/simulateModel.png)
-! [POSTupdateEdge](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/updateEdge.png)
+![POSTupdateEdge](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/updateEdge.png)
 
 
 ## Esempi di Chiamate API
@@ -73,7 +73,7 @@ Di seguito vengono riportati i diagrammi UML:
 | ---- | --------------------- | --- |
 | POST | /createGraph          | Sì  |
 | POST | /updateEdge           | Sì  |
-| POST | /acceptRequest        | Sì  |
+| POST | /acceptDenyRequest        | Sì  |
 | POST | /executeModel         | Sì  |
 | POST | /rechargeTokens       | Sì  |
 | POST | /getGraphRequests     | Sì  |
