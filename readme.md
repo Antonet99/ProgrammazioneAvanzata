@@ -55,11 +55,17 @@ Di seguito vengono riportati i diagrammi UML:
 
 ![usecase](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/usecase.png)
 
+![POSTcreateGraph](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/createGraph.png)
 ![GETallGraphs](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/GETallGraphs.png)
 ![POSTexecuteModel](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTexecuteModel.png)
 ![POSTgetGraphRequests](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTgetGraphRequests.png)
 ![POSTgraphPendingRequests](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTgraphPendingRequests.png)
+![POSTacceptDenyRequest](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/acceptDenyRequest.png)
 ![POSTrechargeTokens](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/POSTrechargeTokens.png)
+![POSTgetMyPendingRequest](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/getMyPendingRequest.png)
+![POSTsimulateModel](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/simulateModel.png)
+! [POSTupdateEdge](https://github.com/Antonet99/ProgrammazioneAvanzata/blob/main/resources/updateEdge.png)
+
 
 ## Esempi di Chiamate API
 
