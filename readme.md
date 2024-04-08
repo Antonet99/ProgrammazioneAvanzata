@@ -233,19 +233,19 @@ Esempio di **payload:**
 ```json
 {
   "id_graph": 1,
-  "options":  {
-	    "start": 1,
-	    "stop": 2,
-	    "step": 0.1
-	    }
-  "route":  {
-	    "start": "A",
-	    "goal": "D"
-	    }
-	"edge":  {
-		"node1": "A",
-		"node2": "B",
-		}
+  "options": {
+    "start": 1,
+    "stop": 2,
+    "step": 0.1
+  },
+  "route": {
+    "start": "A",
+    "goal": "D"
+  },
+  "edge": {
+    "node1": "A",
+    "node2": "B"
+  }
 }
 ```
 
