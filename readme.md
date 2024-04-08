@@ -320,5 +320,5 @@ Si può procedere con l’esecuzione di una serie di test già configurati impor
 
 ### Autori
 
-- Antonio Baio: [Github](https://github.com/giordanoangelini)
-- Christian Parente: [Github](https://github.com/DiSilvestreCristian)
+- Antonio Baio: [Github](https://github.com/Antonet99)
+- Christian Parente: [Github](https://github.com/Parents99)
