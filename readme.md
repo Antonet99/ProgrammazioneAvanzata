@@ -1,3 +1,4 @@
+
 # Gestione di Modelli di Ottimizzazione su Grafo
 
 [![Made with Node.js](https://img.shields.io/badge/Node.js->=12-blue?logo=node.js&logoColor=white)](https://nodejs.org "Go to Node.js homepage") [![Made with TypeScript](https://img.shields.io/badge/TypeScript-4-blue?logo=typescript&logoColor=white)](https://typescriptlang.org "Go to TypeScript homepage") [![Made with PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-blue?logo=postgresql&logoColor=white)](https://www.postgresql.org/ "Go to PostgresSQL homepage") [![Made with Docker](https://img.shields.io/badge/Made_with-Docker-blue?logo=docker&logoColor=white)](https://www.docker.com/ "Go to Docker homepage")
@@ -252,7 +253,7 @@ Esempio di **payload:**
 
 ### - Recupero di tutte le richieste di modifica per un utente proprietario di un modello
 
-**Rotta:** `GET /getMyPendingRequest
+**Rotta:** `GET /getMyPendingRequest`
 
 Per questa rotta è necessaria soltanto l'autenticazione, ma non la specificazione di parametri all'interno del body
 
@@ -265,8 +266,6 @@ Per questa rotta non è necessaria nè l'autenticazione nè la specificazione di
 Questi sono gli esempi delle principali chiamate API disponibili nel sistema.
 
 ## Avvio del servizio
-
-All'avvio del servizio tramite Docker, al fine di poter utilizzare l'app, il database verrà popolato con alcuni `user` (per maggiori info si rimanda al file `seed.sql`).
 
 Prerequisiti:
 
@@ -304,6 +303,8 @@ $ docker-compose up
 ```
 
 - Eseguire le richieste sulla porta 3000 tramite cURL o Postman
+
+All'avvio del servizio tramite Docker, al fine di poter utilizzare l'app, il database verrà popolato con alcuni `user` (per maggiori info si rimanda al file `seed.sql`).
 
 ## Test del progetto
 
